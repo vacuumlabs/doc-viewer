@@ -14,13 +14,18 @@ app.use(cookieParser())
 function* main(req, res) {
   const token = req.cookies.access_token
   if (!token) {
+    res.cookie('redirectAfterLogin', req.url, {httpOnly: true})
     res.redirect('/login')
     return
   }
 
   const repo = req.params.repo
-  const canAccess = yield run(amICollaborator, token, c.ghOrganization, repo)
+  if (!repo) {
+    res.send(`Tell me which repo do you want to see!`)
+    return
+  }
 
+  const canAccess = yield run(amICollaborator, token, c.ghOrganization, repo)
   res.send(`I ${canAccess ? 'can' : 'can not'} access ${repo}.`)
 }
 
@@ -55,7 +60,7 @@ function* oauth(req, res) {
   const authJSON = yield authRes.json()
   if (authJSON.access_token) {
     res.cookie('access_token', authJSON.access_token, {httpOnly: true})
-    res.redirect('/')
+    res.redirect(req.cookies.redirectAfterLogin || '/repo')
   } else {
     res.redirect('/login')
   }
@@ -63,6 +68,7 @@ function* oauth(req, res) {
 
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
+register(app, 'get', '/repo', main)
 register(app, 'get', '/repo/:repo', main)
 
 run(function* () {
