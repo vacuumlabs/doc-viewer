@@ -36,7 +36,11 @@ function* oauth(req, res) {
   })
 
   const authJSON = yield authRes.json()
-  res.send(`Access Token: ${authJSON.access_token}<br/>Scope: ${authJSON.scope}`)
+  if (authJSON.access_token) {
+    res.send(`Access Token: ${authJSON.access_token}<br/>Scope: ${authJSON.scope}`)
+  } else {
+    res.redirect('/')
+  }
 }
 
 register(app, 'get', '/', login)
