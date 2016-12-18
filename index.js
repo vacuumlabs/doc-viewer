@@ -4,6 +4,7 @@ import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import c from './config'
+import {amICollaborator} from './ghApi.js'
 
 const app = express()
 const {register, runApp} = expressHelpers
@@ -17,13 +18,16 @@ function* main(req, res) {
     return
   }
 
-  res.send(`Access Token: ${token}`)
+  const repo = req.params.repo
+  const canAccess = yield run(amICollaborator, token, c.ghOrganization, repo)
+
+  res.send(`I ${canAccess ? 'can' : 'can not'} access ${repo}.`)
 }
 
 function* login(req, res) {
   const url = 'https://github.com/login/oauth/authorize'
   const query = {
-    scope: 'user:email',
+    scope: 'repo',
     client_id: c.ghClient.id,
   }
   res.redirect(`${url}?${querystring.stringify(query)}`)
@@ -57,9 +61,9 @@ function* oauth(req, res) {
   }
 }
 
-register(app, 'get', '/', main)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
+register(app, 'get', '/repo/:repo', main)
 
 run(function* () {
   run(runApp)

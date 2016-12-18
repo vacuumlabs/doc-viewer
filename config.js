@@ -10,6 +10,7 @@ export default {
     id: env('GH_CLIENT_ID'),
     secret: env('GH_CLIENT_SECRET'),
   },
+  ghOrganization: env('GH_ORGANIZATION'),
 }
 
 getErrors()
