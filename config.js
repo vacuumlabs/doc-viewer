@@ -5,7 +5,11 @@ dotenv.config()
 const {bool, env, getErrors} = e(process.env)
 
 export default {
-  port: env('PORT')
+  port: env('PORT'),
+  ghClient: {
+    id: env('GH_CLIENT_ID'),
+    secret: env('GH_CLIENT_SECRET'),
+  },
 }
 
 getErrors()
