@@ -4,18 +4,22 @@ import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import c from './config'
-import {amICollaborator} from './ghApi.js'
+import {amICollaborator, errorUnauthorized} from './ghApi.js'
 
 const app = express()
 const {register, runApp} = expressHelpers
 
 app.use(cookieParser())
 
+function sendToLogin(req, res) {
+  res.cookie('redirectAfterLogin', req.url, {httpOnly: true})
+  res.redirect('/login')
+}
+
 function* main(req, res) {
   const token = req.cookies.access_token
   if (!token) {
-    res.cookie('redirectAfterLogin', req.url, {httpOnly: true})
-    res.redirect('/login')
+    sendToLogin(req, res)
     return
   }
 
@@ -26,6 +30,16 @@ function* main(req, res) {
   }
 
   const canAccess = yield run(amICollaborator, token, c.ghOrganization, repo)
+    .catch((e) => {
+      if (e.error === errorUnauthorized) return e
+      else throw(e)
+    })
+
+  if (canAccess.error) {
+    sendToLogin(req, res)
+    return
+  }
+
   res.send(`I ${canAccess ? 'can' : 'can not'} access ${repo}.`)
 }
 
