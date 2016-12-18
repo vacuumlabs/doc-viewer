@@ -1,0 +1,20 @@
+{
+  "name": "doc-viewer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:vacuumlabs/doc-viewer.git",
+  "author": "Samuel Hapák <samuel.hapak@gmail.com>",
+  "license": "Unlicense",
+  "scripts": {
+    "start": "babel-node index.js"
+  },
+  "dependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-node6": "^11.0.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "dotenv": "^2.0.0",
+    "express": "^4.14.0",
+    "lodash": "^4.17.2",
+    "yacol": "^0.7.0"
+  }
+}
