@@ -1,11 +1,24 @@
 import querystring from 'querystring'
 import express from 'express'
 import {expressHelpers, run} from 'yacol'
+import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import c from './config'
 
 const app = express()
 const {register, runApp} = expressHelpers
+
+app.use(cookieParser())
+
+function* main(req, res) {
+  const token = req.cookies.access_token
+  if (!token) {
+    res.redirect('/login')
+    return
+  }
+
+  res.send(`Access Token: ${token}`)
+}
 
 function* login(req, res) {
   const url = 'https://github.com/login/oauth/authorize'
@@ -37,13 +50,15 @@ function* oauth(req, res) {
 
   const authJSON = yield authRes.json()
   if (authJSON.access_token) {
-    res.send(`Access Token: ${authJSON.access_token}<br/>Scope: ${authJSON.scope}`)
-  } else {
+    res.cookie('access_token', authJSON.access_token, {httpOnly: true})
     res.redirect('/')
+  } else {
+    res.redirect('/login')
   }
 }
 
-register(app, 'get', '/', login)
+register(app, 'get', '/', main)
+register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
 
 run(function* () {
