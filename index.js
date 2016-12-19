@@ -1,4 +1,5 @@
 import querystring from 'querystring'
+import path from 'path'
 import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
@@ -80,10 +81,28 @@ function* oauth(req, res) {
   }
 }
 
+function* docs(req, res) {
+  const docId = req.params.docId
+  const localPart = path.normalize(req.params[0] || '/')
+
+  const isReqValid =
+      docId
+      && docId.match(/^[a-zA-Z0-9]*$/)
+      && !localPart.startsWith('..')
+
+  if (!isReqValid) {
+    res.status(404).send('Not Found')
+    return
+  }
+
+  res.sendFile(path.join(c.docsPath, docId, localPart))
+}
+
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
 register(app, 'get', '/repo', main)
 register(app, 'get', '/repo/:repo', main)
+register(app, 'get', '/docs/:docId/*?', docs)
 
 run(function* () {
   run(runApp)
