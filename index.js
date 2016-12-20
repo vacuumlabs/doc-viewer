@@ -18,31 +18,17 @@ function sendToLogin(req, res) {
   res.redirect('/login')
 }
 
-function* main(req, res) {
+function* checkRights(req, repo) {
+  if (repo == null) return true
+
   const token = req.cookies.access_token
-  if (!token) {
-    sendToLogin(req, res)
-    return
-  }
+  if (!token) return {error: errorUnauthorized}
 
-  const repo = req.params.repo
-  if (!repo) {
-    res.send(`Tell me which repo do you want to see!`)
-    return
-  }
-
-  const canAccess = yield run(amICollaborator, token, c.ghOrganization, repo)
+  return yield run(amICollaborator, token, c.ghOrganization, repo)
     .catch((e) => {
       if (e.error === errorUnauthorized) return e
       else throw(e)
     })
-
-  if (canAccess.error) {
-    sendToLogin(req, res)
-    return
-  }
-
-  res.send(`I ${canAccess ? 'can' : 'can not'} access ${repo}.`)
 }
 
 function* login(req, res) {
@@ -76,7 +62,7 @@ function* oauth(req, res) {
   const authJSON = yield authRes.json()
   if (authJSON.access_token) {
     res.cookie('access_token', authJSON.access_token, {httpOnly: true})
-    res.redirect(req.cookies.redirectAfterLogin || '/repo')
+    res.redirect(req.cookies.redirectAfterLogin || '/')
   } else {
     res.redirect('/login')
   }
@@ -99,20 +85,30 @@ function* docs(req, res) {
   const root = path.join(c.docsPath, docId)
 
   const configFile = path.join(root, 'docs.json')
-  if ((yield fs.stat(configFile)).isFile()) {
-    const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
-    if (config.read) {
-      console.log(`Reading is limited to ${config.read}`)
-    }
-  }
+  const config = (yield fs.stat(configFile)).isFile()
+      ? JSON.parse(yield fs.readFile(configFile, 'utf-8'))
+      : {}
 
-  res.sendFile(path.join(root, localPart))
+  const hasRights = yield run(checkRights, req, config.read)
+
+  if (hasRights.error) {
+    sendToLogin(req, res)
+    return
+  } else if (hasRights === true) {
+    res.sendFile(path.join(root, localPart))
+    return
+  } else if (hasRights === false) {
+    res.status(401).send('You do not have rights to access these docs.')
+  }
 }
 
+function* index(req, res) {
+  res.send('Nothing interesting here.')
+}
+
+register(app, 'get', '/', index)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
-register(app, 'get', '/repo', main)
-register(app, 'get', '/repo/:repo', main)
 register(app, 'get', '/docs/:docId/*?', docs)
 
 run(function* () {
