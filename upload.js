@@ -2,6 +2,12 @@ import archiver from 'archiver'
 import fs from 'mz/fs'
 import path from 'path'
 import {run} from 'yacol'
+import http from 'http'
+import e from './env.js'
+import dotenv from 'dotenv'
+dotenv.config()
+
+const {env, getErrors} = e(process.env)
 
 function* ignore(folder) {
   const ignoreFile = path.join(folder, '.docsignore')
@@ -15,9 +21,20 @@ function* ignore(folder) {
 }
 
 function* upload(folder) {
-  const output = fs.createWriteStream(path.join(__dirname, 'example.zip'))
   const archive = archiver('zip')
-  archive.pipe(output)
+  const uploadReq = http.request({
+    protocol: env('PROTOCOL'),
+    host: env('HOST'),
+    port: env('PORT'),
+    path: '/upload',
+    method: 'PUT',
+  })
+  getErrors()
+
+  uploadReq.on('close', () => uploadReq.end())
+
+  archive.pipe(uploadReq)
+
   archive.glob('**/*', {
     dot: true,
     cwd: folder,

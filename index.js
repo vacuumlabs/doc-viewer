@@ -104,6 +104,14 @@ function* docs(req, res) {
   }
 }
 
+function* upload(req, res) {
+  const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
+  const output = fs.createWriteStream(path.join(__dirname, `${docId}.zip`))
+  req.pipe(output)
+
+  req.on('end', () => res.status(200).send())
+}
+
 function* index(req, res) {
   res.send('Nothing interesting here.')
 }
@@ -112,6 +120,7 @@ register(app, 'get', '/', index)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
 register(app, 'get', '/docs/:docId/*?', docs)
+register(app, 'put', '/upload', upload)
 
 run(function* () {
   run(runApp)
