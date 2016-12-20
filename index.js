@@ -6,10 +6,12 @@ import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import fs from 'mz/fs'
 import c from './config'
-import {amICollaborator, errorUnauthorized} from './ghApi.js'
+import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
+import memoize from './memoize'
 
 const app = express()
 const {register, runApp} = expressHelpers
+const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
 
 app.use(cookieParser())
 
