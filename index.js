@@ -8,6 +8,7 @@ import fs from 'mz/fs'
 import c from './config'
 import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
 import memoize from './memoize'
+import unzip from 'unzip2'
 
 const app = express()
 const {register, runApp} = expressHelpers
@@ -106,9 +107,7 @@ function* docs(req, res) {
 
 function* upload(req, res) {
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
-  const output = fs.createWriteStream(path.join(__dirname, `${docId}.zip`))
-  req.pipe(output)
-
+  req.pipe(unzip.Extract({path: path.join(c.docsPath, docId)}))
   req.on('end', () => res.status(200).send())
 }
 
