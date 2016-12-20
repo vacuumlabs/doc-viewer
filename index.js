@@ -4,6 +4,7 @@ import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
+import fs from 'mz/fs'
 import c from './config'
 import {amICollaborator, errorUnauthorized} from './ghApi.js'
 
@@ -95,7 +96,17 @@ function* docs(req, res) {
     return
   }
 
-  res.sendFile(path.join(c.docsPath, docId, localPart))
+  const root = path.join(c.docsPath, docId)
+
+  const configFile = path.join(root, 'docs.json')
+  if ((yield fs.stat(configFile)).isFile()) {
+    const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
+    if (config.read) {
+      console.log(`Reading is limited to ${config.read}`)
+    }
+  }
+
+  res.sendFile(path.join(root, localPart))
 }
 
 register(app, 'get', '/login', login)
