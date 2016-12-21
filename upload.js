@@ -40,7 +40,7 @@ function* upload(folder) {
   archive.pipe(uploadReq)
 
   archive.glob('**/*', {
-    dot: true,
+    dot: false,
     cwd: folder,
     ignore: yield run(ignore, folder)
   })
