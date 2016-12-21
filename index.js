@@ -18,7 +18,7 @@ app.use(cookieParser())
 
 function sendToLogin(req, res) {
   res.cookie('redirectAfterLogin', req.url, {httpOnly: true, secure: c.isHttps})
-  res.redirect('/login')
+  res.redirect(r.login)
 }
 
 function* checkRights(req, repo) {
@@ -65,13 +65,13 @@ function* oauth(req, res) {
   const authJSON = yield authRes.json()
   if (authJSON.access_token) {
     res.cookie('access_token', authJSON.access_token, {httpOnly: true})
-    res.redirect(req.cookies.redirectAfterLogin || '/')
+    res.redirect(req.cookies.redirectAfterLogin || r.index)
   } else {
-    res.redirect('/login')
+    res.redirect(r.login)
   }
 }
 
-const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-]*$/)
+const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
 function docs(subPath) {
   return function* (req, res) {
@@ -125,7 +125,7 @@ function* upload(req, res) {
   req.on('end', () => res.status(200).send(docId))
 }
 
-function* link(req, res) {
+function* alias(req, res) {
   if (!assertApiKey(req, res)) return
 
   const {docId, name} = req.params
@@ -154,13 +154,27 @@ function* index(req, res) {
   res.send('Nothing interesting here.')
 }
 
-register(app, 'get', '/', index)
-register(app, 'get', '/login', login)
-register(app, 'get', '/oauth', oauth)
-register(app, 'get', '/drafts/:docId/*?', docs(c.draftFolder))
-register(app, 'get', '/docs/:docId/*?', docs(c.finalFolder))
-register(app, 'post', '/upload', upload)
-register(app, 'put', '/link/:docId/:name', link)
+const r = {
+  index: '/',
+  login: '/$login',
+  oauth: '/$oauth',
+  drafts: '/$drafts/:docId/*?',
+  upload: '/$upload',
+  alias: '/$alias/:docId/:name',
+  docs: '/:docId/*?',
+}
+
+const esc = (s) => s.replace('$', '\\$')
+
+register(app, 'get', esc(r.index), index)
+register(app, 'get', esc(r.login), login)
+register(app, 'get', esc(r.oauth), oauth)
+register(app, 'get', esc(r.drafts), docs(c.draftFolder))
+register(app, 'post', esc(r.upload), upload)
+register(app, 'put', esc(r.alias), alias)
+
+// Has to be the last one, otherwise it would match all other routes.
+register(app, 'get', r.docs, docs(c.finalFolder))
 
 run(function* () {
   run(runApp)

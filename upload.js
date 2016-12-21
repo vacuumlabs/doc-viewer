@@ -61,7 +61,7 @@ function* upload(folder) {
     protocol: env('PROTOCOL'),
     host: env('HOST'),
     port: env('PORT'),
-    path: '/upload',
+    path: '/$upload',
     method: 'POST',
     headers: {
       'Authorization': env('API_KEY'),
@@ -94,7 +94,7 @@ function* link(folder, docId) {
   const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
   if (!config.alias) throw new Error(`Alias not defined in ${configFile}`)
 
-  const url = `${baseUrl()}/link/${docId}/${config.alias}`
+  const url = `${baseUrl()}/$alias/${docId}/${config.alias}`
   const result = yield fetch(url, {
     method: 'PUT',
     headers: {'Authorization': env('API_KEY')}
