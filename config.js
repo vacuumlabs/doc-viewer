@@ -18,6 +18,8 @@ export default {
   },
   ghOrganization: env('GH_ORGANIZATION'),
   docsPath: toAbsolute(env('DOCS_PATH')),
+  draftFolder: 'draft',
+  finalFolder: 'final',
 }
 
 getErrors()

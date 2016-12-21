@@ -71,15 +71,14 @@ function* oauth(req, res) {
   }
 }
 
+const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-]*$/)
+
 function docs(subPath) {
   return function* (req, res) {
     const docId = req.params.docId
     const localPart = path.normalize(req.params[0] || '/')
 
-    const isReqValid =
-        docId
-        && docId.match(/^[a-zA-Z0-9-]*$/)
-        && !localPart.startsWith('..')
+    const isReqValid = validDocId(docId) && !localPart.startsWith('..')
 
     if (!isReqValid) {
       res.status(404).send('Not Found')
@@ -110,14 +109,45 @@ function docs(subPath) {
   }
 }
 
-function* upload(req, res) {
-  const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
+function assertApiKey(req, res) {
   if (req.get('Authorization') !== c.apiKey) {
     res.status(401).send('Invalid API Key')
-    return
+    return false
   }
+  return true
+}
+
+function* upload(req, res) {
+  if (!assertApiKey(req, res)) return
+
+  const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
   req.pipe(unzip.Extract({path: path.join(c.docsPath, docId)}))
   req.on('end', () => res.status(200).send(docId))
+}
+
+function* link(req, res) {
+  if (!assertApiKey(req, res)) return
+
+  const {docId, name} = req.params
+  const isReqValid = validDocId(docId) && validDocId(name)
+  if (!isReqValid) {
+    res.status(400).send('Invalid request.')
+    return
+  }
+
+  // Path to created link
+  const pathToLink = path.join(c.docsPath, c.finalFolder, name)
+  yield fs.unlink(pathToLink).catch((e) => {
+    if (e.code === 'ENOENT') return
+    else throw e
+  })
+
+  yield fs.symlink(
+    // Relative path as from /final folder
+    path.join('..', c.draftFolder, docId),
+    pathToLink
+  )
+  res.status(200).send()
 }
 
 function* index(req, res) {
@@ -127,9 +157,10 @@ function* index(req, res) {
 register(app, 'get', '/', index)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
-register(app, 'get', '/drafts/:docId/*?', docs('draft'))
-register(app, 'get', '/docs/:docId/*?', docs('final'))
+register(app, 'get', '/drafts/:docId/*?', docs(c.draftFolder))
+register(app, 'get', '/docs/:docId/*?', docs(c.finalFolder))
 register(app, 'post', '/upload', upload)
+register(app, 'put', '/link/:docId/:name', link)
 
 run(function* () {
   run(runApp)
