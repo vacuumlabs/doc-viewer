@@ -59,6 +59,9 @@ function* upload(folder) {
     port: env('PORT'),
     path: '/upload',
     method: 'POST',
+    headers: {
+      'Authorization': env('API_KEY'),
+    },
   }, callback)
   getErrors()
 

@@ -8,6 +8,7 @@ const {bool, env, getErrors} = e(process.env)
 const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 
 export default {
+  apiKey: env('API_KEY'),
   port: env('PORT'),
   authorizationMaxAge: env('AUTHORIZATION_MAX_AGE'),
   cacheMaxRecords: 1000,

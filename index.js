@@ -110,6 +110,10 @@ function* docs(req, res) {
 
 function* upload(req, res) {
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
+  if (req.get('Authorization') !== c.apiKey) {
+    res.status(401).send('Invalid API Key')
+    return
+  }
   req.pipe(unzip.Extract({path: path.join(c.docsPath, docId)}))
   req.on('end', () => res.status(200).send(docId))
 }
