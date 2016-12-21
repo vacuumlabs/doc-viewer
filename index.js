@@ -17,7 +17,7 @@ const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authoriza
 app.use(cookieParser())
 
 function sendToLogin(req, res) {
-  res.cookie('redirectAfterLogin', req.url, {httpOnly: true})
+  res.cookie('redirectAfterLogin', req.url, {httpOnly: true, secure: c.isHttps})
   res.redirect('/login')
 }
 
