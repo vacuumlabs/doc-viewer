@@ -88,9 +88,12 @@ function* docs(req, res) {
   const root = path.join(c.docsPath, docId)
 
   const configFile = path.join(root, 'docs.json')
-  const config = (yield fs.stat(configFile)).isFile()
-      ? JSON.parse(yield fs.readFile(configFile, 'utf-8'))
-      : {}
+  const config = yield run(function*() {
+    return JSON.parse(yield fs.readFile(configFile, 'utf-8'))
+  }).catch((e) => {
+    if (e.code === 'ENOENT') return {}
+    else throw e
+  })
 
   const hasRights = yield run(checkRights, req, config.read)
 

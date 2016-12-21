@@ -15,9 +15,13 @@ function* ignore(folder) {
       .map((s) => s.trim())
       .filter((s) => !s.match(/^#/) && s !== '')
 
-  return (yield fs.stat(ignoreFile)).isFile()
-      ? parse(yield fs.readFile(ignoreFile, 'utf-8'))
-      : []
+
+  return yield run(function*() {
+    return parse(yield fs.readFile(ignoreFile, 'utf-8'))
+  }).catch((e) => {
+    if (e.code === 'ENOENT') return []
+    else throw e
+  })
 }
 
 function* upload(folder) {
