@@ -5,6 +5,9 @@ import {run} from 'yacol'
 import http from 'http'
 import e from './env.js'
 import dotenv from 'dotenv'
+import parseArgs from 'minimist'
+import fetch from 'node-fetch'
+
 dotenv.config()
 
 const {env, getErrors} = e(process.env)
@@ -41,14 +44,15 @@ function response() {
   }
 }
 
-function deployedUrl(docId) {
+function baseUrl() {
   const protocol = env('PROTOCOL').toLowerCase()
   const defaultPorts = {'http:': '80', 'https:': '443'}
-
   const portPart = env('PORT') !== defaultPorts[protocol] ? `:${env('PORT')}` : ''
+  return `${protocol}//${env('HOST')}${portPart}`
 
-  return `${protocol}//${env('HOST')}${portPart}/drafts/${docId}/`
 }
+
+const deployedUrl = (docId, isDraft) => `${baseUrl()}/${isDraft ? 'drafts' : 'docs'}/${docId}/`
 
 function* upload(folder) {
   const archive = archiver('zip')
@@ -80,14 +84,46 @@ function* upload(folder) {
   if (result.statusCode !== 200) {
     throw new Error(`Server returned: HTTP ${result.statusCode} -- ${result.body}`)
   } else{
-    console.log(`Deploy successful on ${deployedUrl(result.body)}`)
+    console.log(`Deploy successful on ${deployedUrl(result.body, true)}`)
+    return result.body
   }
 }
 
-const folder = process.argv[2]
+function* link(folder, docId) {
+  const configFile = path.join(folder, 'docs.json')
+  const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
+  if (!config.alias) throw new Error(`Alias not defined in ${configFile}`)
+
+  const url = `${baseUrl()}/link/${docId}/${config.alias}`
+  const result = yield fetch(url, {
+    method: 'PUT',
+    headers: {'Authorization': env('API_KEY')}
+  })
+
+  if (result.status !== 200) {
+    const body = yield result.text()
+    throw new Error(`Server returned: HTTP ${result.status} -- ${body}`)
+  } else{
+    console.log(`Deploy successful on ${deployedUrl(config.alias, false)}`)
+    return result.body
+  }
+}
+
+const args = parseArgs(process.argv.slice(2), {
+  alias: {'alias': 'a'},
+  'boolean': ['alias'],
+  })
+
+const folder = args['_'][0]
 
 if (!folder) {
-  console.log(`Usage: yarn run upload <folder-to-upload>`)
+  console.log(`usage: yarn run upload -- [-a] folder`)
   process.exit(0)
 }
-run(upload, process.argv[2])
+
+run(function* () {
+  const docId = yield run(upload, folder)
+  if (args.alias) {
+    yield run(link, folder, docId)
+  }
+})
