@@ -111,7 +111,7 @@ function* docs(req, res) {
 function* upload(req, res) {
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
   req.pipe(unzip.Extract({path: path.join(c.docsPath, docId)}))
-  req.on('end', () => res.status(200).send())
+  req.on('end', () => res.status(200).send(docId))
 }
 
 function* index(req, res) {
@@ -121,8 +121,8 @@ function* index(req, res) {
 register(app, 'get', '/', index)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
-register(app, 'get', '/docs/:docId/*?', docs)
-register(app, 'put', '/upload', upload)
+register(app, 'get', '/docs/v/:docId/*?', docs)
+register(app, 'post', '/upload', upload)
 
 run(function* () {
   run(runApp)

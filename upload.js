@@ -24,15 +24,42 @@ function* ignore(folder) {
   })
 }
 
+function response() {
+  let resolve, reject
+
+  return {
+    promise: new Promise((res, rej) => {
+      resolve = res
+      reject = rej
+    }),
+    callback: (res) => {
+      const data = []
+      res.on('data', (d) => data.push(d))
+      res.on('error', (e) => reject(e))
+      res.on('end', () => resolve({...res, body: data.join('')}))
+    }
+  }
+}
+
+function deployedUrl(docId) {
+  const protocol = env('PROTOCOL').toLowerCase()
+  const defaultPorts = {'http:': '80', 'https:': '443'}
+
+  const portPart = env('PORT') !== defaultPorts[protocol] ? `:${env('PORT')}` : ''
+
+  return `${protocol}//${env('HOST')}${portPart}/docs/v/${docId}/`
+}
+
 function* upload(folder) {
   const archive = archiver('zip')
+  const {promise, callback} = response()
   const uploadReq = http.request({
     protocol: env('PROTOCOL'),
     host: env('HOST'),
     port: env('PORT'),
     path: '/upload',
-    method: 'PUT',
-  })
+    method: 'POST',
+  }, callback)
   getErrors()
 
   uploadReq.on('close', () => uploadReq.end())
@@ -45,6 +72,13 @@ function* upload(folder) {
     ignore: yield run(ignore, folder)
   })
   archive.finalize()
+
+  const result = yield promise
+  if (result.statusCode !== 200) {
+    throw new Error(`Server returned: HTTP ${result.statusCode} -- ${result.body}`)
+  } else{
+    console.log(`Deploy successful on ${deployedUrl(result.body)}`)
+  }
 }
 
 const folder = process.argv[2]
