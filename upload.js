@@ -47,7 +47,7 @@ function deployedUrl(docId) {
 
   const portPart = env('PORT') !== defaultPorts[protocol] ? `:${env('PORT')}` : ''
 
-  return `${protocol}//${env('HOST')}${portPart}/docs/v/${docId}/`
+  return `${protocol}//${env('HOST')}${portPart}/drafts/${docId}/`
 }
 
 function* upload(folder) {

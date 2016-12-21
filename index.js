@@ -71,40 +71,42 @@ function* oauth(req, res) {
   }
 }
 
-function* docs(req, res) {
-  const docId = req.params.docId
-  const localPart = path.normalize(req.params[0] || '/')
+function docs(subPath) {
+  return function* (req, res) {
+    const docId = req.params.docId
+    const localPart = path.normalize(req.params[0] || '/')
 
-  const isReqValid =
-      docId
-      && docId.match(/^[a-zA-Z0-9]*$/)
-      && !localPart.startsWith('..')
+    const isReqValid =
+        docId
+        && docId.match(/^[a-zA-Z0-9-]*$/)
+        && !localPart.startsWith('..')
 
-  if (!isReqValid) {
-    res.status(404).send('Not Found')
-    return
-  }
+    if (!isReqValid) {
+      res.status(404).send('Not Found')
+      return
+    }
 
-  const root = path.join(c.docsPath, docId)
+    const root = path.join(c.docsPath, subPath, docId)
 
-  const configFile = path.join(root, 'docs.json')
-  const config = yield run(function*() {
-    return JSON.parse(yield fs.readFile(configFile, 'utf-8'))
-  }).catch((e) => {
-    if (e.code === 'ENOENT') return {}
-    else throw e
-  })
+    const configFile = path.join(root, 'docs.json')
+    const config = yield run(function*() {
+      return JSON.parse(yield fs.readFile(configFile, 'utf-8'))
+    }).catch((e) => {
+      if (e.code === 'ENOENT') return {}
+      else throw e
+    })
 
-  const hasRights = yield run(checkRights, req, config.read)
+    const hasRights = yield run(checkRights, req, config.read)
 
-  if (hasRights.error) {
-    sendToLogin(req, res)
-    return
-  } else if (hasRights === true) {
-    res.sendFile(path.join(root, localPart))
-    return
-  } else if (hasRights === false) {
-    res.status(401).send('You do not have rights to access these docs.')
+    if (hasRights.error) {
+      sendToLogin(req, res)
+      return
+    } else if (hasRights === true) {
+      res.sendFile(path.join(root, localPart))
+      return
+    } else if (hasRights === false) {
+      res.status(401).send('You do not have rights to access these docs.')
+    }
   }
 }
 
@@ -125,7 +127,8 @@ function* index(req, res) {
 register(app, 'get', '/', index)
 register(app, 'get', '/login', login)
 register(app, 'get', '/oauth', oauth)
-register(app, 'get', '/docs/v/:docId/*?', docs)
+register(app, 'get', '/drafts/:docId/*?', docs('draft'))
+register(app, 'get', '/docs/:docId/*?', docs('final'))
 register(app, 'post', '/upload', upload)
 
 run(function* () {
