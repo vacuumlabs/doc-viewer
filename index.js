@@ -121,7 +121,7 @@ function* upload(req, res) {
   if (!assertApiKey(req, res)) return
 
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
-  req.pipe(unzip.Extract({path: path.join(c.docsPath, docId)}))
+  req.pipe(unzip.Extract({path: path.join(c.docsPath, c.draftFolder, docId)}))
   req.on('end', () => res.status(200).send(docId))
 }
 
