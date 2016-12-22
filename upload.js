@@ -3,11 +3,13 @@ import fs from 'mz/fs'
 import path from 'path'
 import {run} from 'yacol'
 import http from 'http'
+import https from 'https'
 import e from './env.js'
 import parseArgs from 'minimist'
 import fetch from 'node-fetch'
 
-const {env, getErrors} = e()
+const {bool, env, getErrors} = e()
+const request = (bool('HTTPS') ? https : http).request
 
 function* ignore(folder) {
   const ignoreFile = path.join(folder, '.docsignore')
@@ -42,7 +44,7 @@ function response() {
 }
 
 function baseUrl() {
-  const protocol = env('PROTOCOL').toLowerCase()
+  const protocol = bool('HTTPS') ? 'https:' : 'http:'
   const defaultPorts = {'http:': '80', 'https:': '443'}
   const portPart = env('PORT') !== defaultPorts[protocol] ? `:${env('PORT')}` : ''
   return `${protocol}//${env('HOST')}${portPart}`
@@ -54,8 +56,7 @@ const deployedUrl = (docId, isDraft) => `${baseUrl()}/${isDraft ? 'drafts' : 'do
 function* upload(folder) {
   const archive = archiver('zip')
   const {promise, callback} = response()
-  const uploadReq = http.request({
-    protocol: env('PROTOCOL'),
+  const uploadReq = request({
     host: env('HOST'),
     port: env('PORT'),
     path: '/$upload',

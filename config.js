@@ -6,7 +6,7 @@ const {bool, env, getErrors} = e()
 const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 
 export default {
-  isHttps: env('PROTOCOL').toLowerCase() === 'https:',
+  isHttps: bool('HTTPS'),
   apiKey: env('API_KEY'),
   port: env('PORT'),
   authorizationMaxAge: env('AUTHORIZATION_MAX_AGE'),
