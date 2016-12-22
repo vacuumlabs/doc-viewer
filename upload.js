@@ -51,7 +51,7 @@ function baseUrl() {
 
 }
 
-const deployedUrl = (docId, isDraft) => `${baseUrl()}/${isDraft ? 'drafts' : 'docs'}/${docId}/`
+const deployedUrl = (docId, isDraft) => `${baseUrl()}${isDraft ? '/$drafts' : ''}/${docId}/`
 
 function* upload(folder) {
   const archive = archiver('zip')
