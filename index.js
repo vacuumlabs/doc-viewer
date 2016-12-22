@@ -9,6 +9,7 @@ import c from './config'
 import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
 import memoize from './memoize'
 import unzip from 'unzip2'
+import archiver from 'archiver'
 
 const app = express()
 const {register, runApp} = expressHelpers
@@ -125,6 +126,23 @@ function* upload(req, res) {
   req.on('end', () => res.status(200).send(docId))
 }
 
+function* backup(req, res) {
+  if (!assertApiKey(req, res)) return
+
+  const archive = archiver('zip')
+
+  res.on('close', () => {
+    res.end()
+    console.log('hell')
+  })
+  archive.pipe(res)
+  archive.glob('**/*', {
+    dot: true,
+    cwd: c.docsPath,
+  })
+  archive.finalize()
+}
+
 function* alias(req, res) {
   if (!assertApiKey(req, res)) return
 
@@ -157,6 +175,7 @@ const r = {
   oauth: '/$oauth',
   drafts: '/$drafts/:docId/*?',
   upload: '/$upload',
+  backup: '/$backup',
   alias: '/$alias/:docId/:name',
   docs: '/:docId/*?',
 }
@@ -168,6 +187,7 @@ register(app, 'get', esc(r.login), login)
 register(app, 'get', esc(r.oauth), oauth)
 register(app, 'get', esc(r.drafts), docs(c.draftPath))
 register(app, 'post', esc(r.upload), upload)
+register(app, 'get', esc(r.backup), backup)
 register(app, 'put', esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.

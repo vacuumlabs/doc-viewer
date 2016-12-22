@@ -17,6 +17,7 @@ export default {
     secret: env('GH_CLIENT_SECRET'),
   },
   ghOrganization: env('GH_ORGANIZATION'),
+  docsPath: docsPath,
   draftPath: path.join(docsPath, 'draft'),
   finalPath: path.join(docsPath, 'final'),
 }
