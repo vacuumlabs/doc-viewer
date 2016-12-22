@@ -143,6 +143,13 @@ function* backup(req, res) {
   archive.finalize()
 }
 
+function* restore(req, res) {
+  if (!assertApiKey(req, res)) return
+
+  req.pipe(unzip.Extract({path: c.docsPath}))
+  req.on('end', () => res.status(200).send())
+}
+
 function* alias(req, res) {
   if (!assertApiKey(req, res)) return
 
@@ -176,6 +183,7 @@ const r = {
   drafts: '/$drafts/:docId/*?',
   upload: '/$upload',
   backup: '/$backup',
+  restore: '/$restore',
   alias: '/$alias/:docId/:name',
   docs: '/:docId/*?',
 }
@@ -188,6 +196,7 @@ register(app, 'get', esc(r.oauth), oauth)
 register(app, 'get', esc(r.drafts), docs(c.draftPath))
 register(app, 'post', esc(r.upload), upload)
 register(app, 'get', esc(r.backup), backup)
+register(app, 'put', esc(r.restore), restore)
 register(app, 'put', esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.
