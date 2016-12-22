@@ -38,3 +38,4 @@ jspm_packages
 
 # Local ENV definitions
 .env
+.env.prod
