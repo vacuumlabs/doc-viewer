@@ -1,5 +1,5 @@
 import archiver from 'archiver'
-import fs from 'mz/fs'
+import fs from 'fs-promise'
 import path from 'path'
 import {run} from 'yacol'
 import http from 'http'

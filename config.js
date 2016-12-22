@@ -5,6 +5,7 @@ const {bool, env, getErrors} = e()
 
 const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 
+const docsPath = path.join(toAbsolute(env('DOCS_PATH')), 'docs')
 export default {
   isHttps: bool('HTTPS'),
   apiKey: env('API_KEY'),
@@ -16,9 +17,8 @@ export default {
     secret: env('GH_CLIENT_SECRET'),
   },
   ghOrganization: env('GH_ORGANIZATION'),
-  docsPath: toAbsolute(env('DOCS_PATH')),
-  draftFolder: 'draft',
-  finalFolder: 'final',
+  draftPath: path.join(docsPath, 'draft'),
+  finalPath: path.join(docsPath, 'final'),
 }
 
 getErrors()

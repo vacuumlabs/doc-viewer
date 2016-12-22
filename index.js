@@ -4,7 +4,7 @@ import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
-import fs from 'mz/fs'
+import fs from 'fs-promise'
 import c from './config'
 import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
 import memoize from './memoize'
@@ -73,7 +73,7 @@ function* oauth(req, res) {
 
 const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
-function docs(subPath) {
+function docs(root) {
   return function* (req, res) {
     const docId = req.params.docId
     const localPart = path.normalize(req.params[0] || '/')
@@ -85,9 +85,9 @@ function docs(subPath) {
       return
     }
 
-    const root = path.join(c.docsPath, subPath, docId)
+    const docRoot = path.join(root, docId)
 
-    const configFile = path.join(root, 'docs.json')
+    const configFile = path.join(docRoot, 'docs.json')
     const config = yield run(function*() {
       return JSON.parse(yield fs.readFile(configFile, 'utf-8'))
     }).catch((e) => {
@@ -101,7 +101,7 @@ function docs(subPath) {
       sendToLogin(req, res)
       return
     } else if (hasRights === true) {
-      res.sendFile(path.join(root, localPart))
+      res.sendFile(path.join(docRoot, localPart))
       return
     } else if (hasRights === false) {
       res.status(401).send('You do not have rights to access these docs.')
@@ -121,7 +121,7 @@ function* upload(req, res) {
   if (!assertApiKey(req, res)) return
 
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
-  req.pipe(unzip.Extract({path: path.join(c.docsPath, c.draftFolder, docId)}))
+  req.pipe(unzip.Extract({path: path.join(c.draftPath, docId)}))
   req.on('end', () => res.status(200).send(docId))
 }
 
@@ -136,17 +136,14 @@ function* alias(req, res) {
   }
 
   // Path to created link
-  const pathToLink = path.join(c.docsPath, c.finalFolder, name)
+  const pathToDraft = path.join(c.draftPath, docId)
+  const pathToLink = path.join(c.finalPath, name)
   yield fs.unlink(pathToLink).catch((e) => {
     if (e.code === 'ENOENT') return
     else throw e
   })
 
-  yield fs.symlink(
-    // Relative path as from /final folder
-    path.join('..', c.draftFolder, docId),
-    pathToLink
-  )
+  yield fs.symlink(pathToDraft, pathToLink)
   res.status(200).send()
 }
 
@@ -169,14 +166,16 @@ const esc = (s) => s.replace('$', '\\$')
 register(app, 'get', esc(r.index), index)
 register(app, 'get', esc(r.login), login)
 register(app, 'get', esc(r.oauth), oauth)
-register(app, 'get', esc(r.drafts), docs(c.draftFolder))
+register(app, 'get', esc(r.drafts), docs(c.draftPath))
 register(app, 'post', esc(r.upload), upload)
 register(app, 'put', esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.
-register(app, 'get', r.docs, docs(c.finalFolder))
+register(app, 'get', r.docs, docs(c.finalPath))
 
 run(function* () {
+  yield fs.ensureDir(c.draftPath)
+  yield fs.ensureDir(c.finalPath)
   run(runApp)
   app.listen(c.port, () =>
     console.log(`App started on localhost:${c.port}.`)
