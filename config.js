@@ -1,9 +1,7 @@
 import e from './env.js'
 import path from 'path'
-import dotenv from 'dotenv'
-dotenv.config()
 
-const {bool, env, getErrors} = e(process.env)
+const {bool, env, getErrors} = e()
 
 const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 

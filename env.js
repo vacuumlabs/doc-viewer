@@ -1,4 +1,8 @@
-export default (env) => {
+import dotenv from 'dotenv'
+
+export default () => {
+  if (process.env['NODE_ENV'] !== 'production') dotenv.config({silent: true})
+  const env = process.env
   let missingEnvs = []
   return {
     bool: (key) => {

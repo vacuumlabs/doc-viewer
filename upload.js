@@ -4,13 +4,10 @@ import path from 'path'
 import {run} from 'yacol'
 import http from 'http'
 import e from './env.js'
-import dotenv from 'dotenv'
 import parseArgs from 'minimist'
 import fetch from 'node-fetch'
 
-dotenv.config()
-
-const {env, getErrors} = e(process.env)
+const {env, getErrors} = e()
 
 function* ignore(folder) {
   const ignoreFile = path.join(folder, '.docsignore')
