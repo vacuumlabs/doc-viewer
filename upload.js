@@ -4,12 +4,29 @@ import path from 'path'
 import {run} from 'yacol'
 import http from 'http'
 import https from 'https'
-import e from './env.js'
+import transenv from 'transenv'
 import parseArgs from 'minimist'
 import fetch from 'node-fetch'
 
-const {bool, env, getErrors} = e()
-const request = (bool('HTTPS') ? https : http).request
+const c = transenv()(({str, bool}) => {
+
+  const isHttps = bool('HTTPS')
+  const protocol = isHttps ? 'https:' : 'http:'
+  const port = str('PORT')
+  const host = str('HOST')
+  const defaultPorts = {'http:': '80', 'https:': '443'}
+  const portPart = port !== defaultPorts[protocol] ? `:${port}` : ''
+  const baseUrl = `${protocol}//${host}${portPart}`
+
+  return {
+    port,
+    host,
+    apiKey: str('API_KEY'),
+    baseUrl,
+    request: (isHttps ? https : http).request,
+  }
+})
+
 
 function* ignore(folder) {
   const ignoreFile = path.join(folder, '.docsignore')
@@ -43,29 +60,21 @@ function response() {
   }
 }
 
-function baseUrl() {
-  const protocol = bool('HTTPS') ? 'https:' : 'http:'
-  const defaultPorts = {'http:': '80', 'https:': '443'}
-  const portPart = env('PORT') !== defaultPorts[protocol] ? `:${env('PORT')}` : ''
-  return `${protocol}//${env('HOST')}${portPart}`
 
-}
-
-const deployedUrl = (docId, isDraft) => `${baseUrl()}${isDraft ? '/$drafts' : ''}/${docId}/`
+const deployedUrl = (docId, isDraft) => `${c.baseUrl}${isDraft ? '/$drafts' : ''}/${docId}/`
 
 function* upload(folder) {
   const archive = archiver('zip')
   const {promise, callback} = response()
-  const uploadReq = request({
-    host: env('HOST'),
-    port: env('PORT'),
+  const uploadReq = c.request({
+    host: c.host,
+    port: c.port,
     path: '/$upload',
     method: 'POST',
     headers: {
-      'Authorization': env('API_KEY'),
+      'Authorization': c.apiKey,
     },
   }, callback)
-  getErrors()
 
   uploadReq.on('close', () => uploadReq.end())
 
@@ -92,10 +101,10 @@ function* link(folder, docId) {
   const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
   if (!config.alias) throw new Error(`Alias not defined in ${configFile}`)
 
-  const url = `${baseUrl()}/$alias/${docId}/${config.alias}`
+  const url = `${c.baseUrl}/$alias/${docId}/${config.alias}`
   const result = yield fetch(url, {
     method: 'PUT',
-    headers: {'Authorization': env('API_KEY')}
+    headers: {'Authorization': c.apiKey}
   })
 
   if (result.status !== 200) {

@@ -4,14 +4,13 @@ import url from 'url'
 import http from 'http'
 import https from 'https'
 import parseArgs from 'minimist'
-import e from './env.js'
+import transenv from 'transenv'
 
-const {env, getErrors} = e()
-
+const apiKey = transenv()(({str}) => str('API_KEY'))
 
 function request(u, subPath, method) {
   const {protocol, hostname, port, path} = url.parse(u)
-  const headers = {'Authorization': env('API_KEY')}
+  const headers = {'Authorization': apiKey}
   const requestFn = {'http:': http.request, 'https:': https.request}[protocol]
   if (requestFn === undefined) throw new Error(`Invalid protocol ${protocol}`)
 
@@ -30,7 +29,6 @@ function request(u, subPath, method) {
     method
   }, resolve)
 
-  getErrors()
   return {request, response}
 }
 

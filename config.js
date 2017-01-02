@@ -1,25 +1,23 @@
-import e from './env.js'
+import transenv from 'transenv'
 import path from 'path'
-
-const {bool, env, getErrors} = e()
 
 const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 
-const docsPath = path.join(toAbsolute(env('DOCS_PATH')), 'docs')
-export default {
-  isHttps: bool('HTTPS'),
-  apiKey: env('API_KEY'),
-  port: env('PORT'),
-  authorizationMaxAge: env('AUTHORIZATION_MAX_AGE'),
-  cacheMaxRecords: 1000,
-  ghClient: {
-    id: env('GH_CLIENT_ID'),
-    secret: env('GH_CLIENT_SECRET'),
-  },
-  ghOrganization: env('GH_ORGANIZATION'),
-  docsPath: docsPath,
-  draftPath: path.join(docsPath, 'draft'),
-  finalPath: path.join(docsPath, 'final'),
-}
-
-getErrors()
+export default transenv()(({str, bool}) => {
+  const docsPath = path.join(toAbsolute(str('DOCS_PATH')), 'docs')
+  return {
+    isHttps: bool('HTTPS'),
+    apiKey: str('API_KEY'),
+    port: str('PORT'),
+    authorizationMaxAge: str('AUTHORIZATION_MAX_AGE'),
+    cacheMaxRecords: 1000,
+    ghClient: {
+      id: str('GH_CLIENT_ID'),
+      secret: str('GH_CLIENT_SECRET'),
+    },
+    ghOrganization: str('GH_ORGANIZATION'),
+    docsPath: docsPath,
+    draftPath: path.join(docsPath, 'draft'),
+    finalPath: path.join(docsPath, 'final'),
+  }
+})
