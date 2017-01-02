@@ -1,0 +1,27 @@
+{
+  "name": "antman-cli",
+  "version": "1.0.0",
+  "description": "CLI tools for AntMan",
+  "repository": "git@github.com:vacuumlabs/doc-viewer.git",
+  "license": "Unlicense",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "prepublish": "npm run build",
+    "antman": "node dist/antman.js"
+  },
+  "bin": {
+    "antman": "dist/antman.js"
+  },
+  "dependencies": {
+    "archiver": "^1.3.0",
+    "fs-promise": "^1.0.0",
+    "minimist": "^1.2.0",
+    "yacol": "^0.7.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "webpack": "2.2.0-rc.3",
+    "webpack-node-externals": "^1.5.4"
+  }
+}
