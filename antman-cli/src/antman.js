@@ -3,8 +3,8 @@ import parseArgs from 'minimist'
 import {upload as _upload, link as _link} from './upload.js'
 import {migrate as _migrate} from './migrate.js'
 
-const usageUpload = 'yarn run antman -- upload [-a] -k api_key host folder'
-const usageMigrate = 'yarn run antman -- migrate -k api_key -f from_url -t to_url'
+const usageUpload = 'antman upload [-a] -k api_key host folder'
+const usageMigrate = 'antman migrate -k api_key -f from_url -t to_url'
 
 function upload(args) {
   const host = args['_'][1]
