@@ -3,7 +3,6 @@ import fs from 'fs-promise'
 import path from 'path'
 import {run} from 'yacol'
 import transenv from 'transenv'
-import parseArgs from 'minimist'
 import request from './request.js'
 
 const apiKey = transenv()(({str}) => str('API_KEY'))
@@ -36,7 +35,7 @@ function deployedUrl(host, docId, isDraft) {
   return `${host}${isDraft ? '/$drafts' : ''}/${docId}/`
 }
 
-function* upload(host, folder) {
+export function* upload(host, folder) {
   const archive = archiver('zip')
   const [uploadReq, response] = request(host, {
     path: '/$upload',
@@ -64,7 +63,7 @@ function* upload(host, folder) {
   }
 }
 
-function* link(host, folder, docId) {
+export function* link(host, folder, docId) {
   const configFile = path.join(folder, 'docs.json')
   const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
   if (!config.alias) throw new Error(`Alias not defined in ${configFile}`)
@@ -85,23 +84,3 @@ function* link(host, folder, docId) {
     return result.body
   }
 }
-
-const args = parseArgs(process.argv.slice(2), {
-  alias: {'alias': 'a'},
-  'boolean': ['alias'],
-  })
-
-const host = args['_'][0]
-const folder = args['_'][1]
-
-if (!folder || !host) {
-  console.log(`usage: yarn run upload -- [-a] host folder`)
-  process.exit(0)
-}
-
-run(function* () {
-  const docId = yield run(upload, host, folder)
-  if (args.alias) {
-    yield run(link, host, folder, docId)
-  }
-})
