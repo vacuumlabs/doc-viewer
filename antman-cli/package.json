@@ -1,6 +1,6 @@
 {
   "name": "antman-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tools for AntMan",
   "repository": "git@github.com:vacuumlabs/doc-viewer.git",
   "license": "Unlicense",

@@ -1,3 +1,4 @@
+var webpack = require('webpack')
 var path = require('path')
 var nodeExternals = require('webpack-node-externals')
 
@@ -12,4 +13,7 @@ module.exports = {
   module: {
     rules: [{test: /\.js$/, use: 'babel-loader'}]
   },
+  plugins: [
+    new webpack.BannerPlugin({banner: "#!/usr/bin/env node", raw: true})
+  ]
 }
