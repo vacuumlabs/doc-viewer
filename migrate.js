@@ -1,8 +1,5 @@
 import {run} from 'yacol'
-import transenv from 'transenv'
 import request from './request.js'
-
-const apiKey = transenv()(({str}) => str('API_KEY'))
 
 function error(url, result) {
   if (result.statusCode !== 200) {
@@ -10,7 +7,7 @@ function error(url, result) {
   }
 }
 
-export function *migrate(from, to) {
+export function *migrate(apiKey, from, to) {
   const [breq, bres] = request(from, {path: '$backup', method: 'GET', apiKey})
   const [rreq, rres] = request(to, {path: '$restore', method: 'PUT', apiKey})
 

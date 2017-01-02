@@ -2,10 +2,7 @@ import archiver from 'archiver'
 import fs from 'fs-promise'
 import path from 'path'
 import {run} from 'yacol'
-import transenv from 'transenv'
 import request from './request.js'
-
-const apiKey = transenv()(({str}) => str('API_KEY'))
 
 function* ignore(folder) {
   const ignoreFile = path.join(folder, '.docsignore')
@@ -35,7 +32,7 @@ function deployedUrl(host, docId, isDraft) {
   return `${host}${isDraft ? '/$drafts' : ''}/${docId}/`
 }
 
-export function* upload(host, folder) {
+export function* upload(apiKey, host, folder) {
   const archive = archiver('zip')
   const [uploadReq, response] = request(host, {
     path: '/$upload',
@@ -63,7 +60,7 @@ export function* upload(host, folder) {
   }
 }
 
-export function* link(host, folder, docId) {
+export function* link(apiKey, host, folder, docId) {
   const configFile = path.join(folder, 'docs.json')
   const config = JSON.parse(yield fs.readFile(configFile, 'utf-8'))
   if (!config.alias) throw new Error(`Alias not defined in ${configFile}`)

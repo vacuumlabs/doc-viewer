@@ -8,7 +8,6 @@
   "scripts": {
     "start": "babel-node -- index.js",
     "antman": "babel-node -- antman.js",
-    "antman-prod": "env `sed 's/#.*$//;/^\\s*$/d' .env.prod` babel-node -- antman.js",
     "deploy-now": "now `sed 's/#.*$//;/^\\s*$/d;s/^/-e /' .env.prod`"
   },
   "dependencies": {
