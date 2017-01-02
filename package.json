@@ -7,7 +7,6 @@
   "license": "Unlicense",
   "scripts": {
     "start": "babel-node -- index.js",
-    "antman": "babel-node -- antman.js",
     "deploy-now": "now `sed 's/#.*$//;/^\\s*$/d;s/^/-e /' .env.prod`"
   },
   "dependencies": {
