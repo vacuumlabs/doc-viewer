@@ -4,16 +4,15 @@ import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
-import fs from 'fs-promise'
 import c from './config'
 import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
 import memoize from './memoize'
-import unzip from 'unzip2'
-import archiver from 'archiver'
+import createS3Client from './s3.js'
 
 const app = express()
 const {register, runApp} = expressHelpers
 const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
+const s3 = createS3Client(c.s3)
 
 app.use(cookieParser())
 
@@ -74,40 +73,58 @@ function* oauth(req, res) {
 
 const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
-function docs(root) {
-  return function* (req, res) {
-    const docId = req.params.docId
-    const localPart = path.normalize(req.params[0] || '/')
+function* serveDoc(docId, localPart, req, res) {
+  localPart = path.normalize(localPart || '/')
+  if (localPart.endsWith('/')) localPart += 'index.html'
 
-    const isReqValid = validDocId(docId) && !localPart.startsWith('..')
+  const isReqValid = validDocId(docId) && !localPart.startsWith('..')
 
-    if (!isReqValid) {
-      res.status(404).send('Not Found')
-      return
-    }
-
-    const docRoot = path.join(root, docId)
-
-    const configFile = path.join(docRoot, 'docs.json')
-    const config = yield run(function*() {
-      return JSON.parse(yield fs.readFile(configFile, 'utf-8'))
-    }).catch((e) => {
-      if (e.code === 'ENOENT') return {}
-      else throw e
-    })
-
-    const hasRights = yield run(checkRights, req, config.read)
-
-    if (hasRights.error) {
-      sendToLogin(req, res)
-      return
-    } else if (hasRights === true) {
-      res.sendFile(path.join(docRoot, localPart))
-      return
-    } else if (hasRights === false) {
-      res.status(401).send('You do not have rights to access these docs.')
-    }
+  if (!isReqValid) {
+    res.status(404).send('Not Found')
+    return
   }
+
+  const docRoot = path.join(c.draftPath, docId)
+
+  const configFile = path.join(docRoot, 'docs.json')
+  const config = yield run(function*() {
+    const file = yield run(s3.readFile, configFile)
+    return JSON.parse(file.Body.toString())
+  }).catch((e) => {
+    if (e.code === 'NoSuchKey') return {}
+    else throw e
+  })
+
+  const hasRights = yield run(checkRights, req, config.read)
+
+  if (hasRights.error) {
+    sendToLogin(req, res)
+    return
+  } else if (hasRights === true) {
+    const file = yield run(s3.readFile, path.join(docRoot, localPart))
+    res.set('Content-Type', file.ContentType)
+    res.set('Content-Length', file.ContentLength)
+    res.send(file.Body)
+    return
+  } else if (hasRights === false) {
+    res.status(401).send('You do not have rights to access these docs.')
+  }
+}
+
+function* drafts(req, res) {
+  yield run(serveDoc, req.params.docId, req.params[0], req, res)
+}
+
+function* docs(req, res) {
+  const docId = yield run(function*() {
+    const file = yield run(s3.readFile, path.join(c.finalPath, req.params.name))
+    return file.Body.toString()
+  }).catch((e) => {
+    if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
+    else throw e
+  })
+
+  yield run(serveDoc, docId, req.params[0], req, res)
 }
 
 function assertApiKey(req, res) {
@@ -122,32 +139,8 @@ function* upload(req, res) {
   if (!assertApiKey(req, res)) return
 
   const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
-  req.pipe(unzip.Extract({path: path.join(c.draftPath, docId)}))
-  req.on('end', () => res.status(200).send(docId))
-}
-
-function* backup(req, res) {
-  if (!assertApiKey(req, res)) return
-
-  const archive = archiver('zip')
-
-  res.on('close', () => {
-    res.end()
-    console.log('hell')
-  })
-  archive.pipe(res)
-  archive.glob('**/*', {
-    dot: true,
-    cwd: c.docsPath,
-  })
-  archive.finalize()
-}
-
-function* restore(req, res) {
-  if (!assertApiKey(req, res)) return
-
-  req.pipe(unzip.Extract({path: c.docsPath}))
-  req.on('end', () => res.status(200).send())
+  yield run(s3.unzip, req, path.join(c.draftPath, docId))
+  res.status(200).send(docId)
 }
 
 function* alias(req, res) {
@@ -160,15 +153,7 @@ function* alias(req, res) {
     return
   }
 
-  // Path to created link
-  const pathToDraft = path.join(c.draftPath, docId)
-  const pathToLink = path.join(c.finalPath, name)
-  yield fs.unlink(pathToLink).catch((e) => {
-    if (e.code === 'ENOENT') return
-    else throw e
-  })
-
-  yield fs.symlink(pathToDraft, pathToLink)
+  yield run(s3.writeFile, path.join(c.finalPath, name), docId)
   res.status(200).send()
 }
 
@@ -182,10 +167,8 @@ const r = {
   oauth: '/$oauth',
   drafts: '/$drafts/:docId/*?',
   upload: '/$upload',
-  backup: '/$backup',
-  restore: '/$restore',
   alias: '/$alias/:docId/:name',
-  docs: '/:docId/*?',
+  docs: '/:name/*?',
 }
 
 const esc = (s) => s.replace('$', '\\$')
@@ -193,18 +176,14 @@ const esc = (s) => s.replace('$', '\\$')
 register(app, 'get', esc(r.index), index)
 register(app, 'get', esc(r.login), login)
 register(app, 'get', esc(r.oauth), oauth)
-register(app, 'get', esc(r.drafts), docs(c.draftPath))
+register(app, 'get', esc(r.drafts), drafts)
 register(app, 'post', esc(r.upload), upload)
-register(app, 'get', esc(r.backup), backup)
-register(app, 'put', esc(r.restore), restore)
 register(app, 'put', esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.
-register(app, 'get', r.docs, docs(c.finalPath))
+register(app, 'get', r.docs, docs)
 
 run(function* () {
-  yield fs.ensureDir(c.draftPath)
-  yield fs.ensureDir(c.finalPath)
   run(runApp)
   app.listen(c.port, () =>
     console.log(`App started on localhost:${c.port}.`)

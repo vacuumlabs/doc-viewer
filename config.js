@@ -1,10 +1,6 @@
 import transenv from 'transenv'
-import path from 'path'
-
-const toAbsolute = (p) => path.isAbsolute(p) ? p : path.join(__dirname, p)
 
 export default transenv()(({str, bool}) => {
-  const docsPath = path.join(toAbsolute(str('DOCS_PATH')), 'docs')
   return {
     isHttps: bool('HTTPS'),
     apiKey: str('API_KEY'),
@@ -16,8 +12,13 @@ export default transenv()(({str, bool}) => {
       secret: str('GH_CLIENT_SECRET'),
     },
     ghOrganization: str('GH_ORGANIZATION'),
-    docsPath: docsPath,
-    draftPath: path.join(docsPath, 'draft'),
-    finalPath: path.join(docsPath, 'final'),
+    s3: {
+      region: str('REGION'),
+      bucket: str('BUCKET'),
+      accessKeyId: str('ACCESS_KEY_ID'),
+      secretAccessKey: str('SECRET_ACCESS_KEY'),
+    },
+    draftPath: 'draft',
+    finalPath: 'final',
   }
 })
