@@ -6,7 +6,7 @@
   "author": "Samuel Hapák <samuel.hapak@gmail.com>",
   "license": "Unlicense",
   "scripts": {
-    "start": "babel-node -- index.js",
+    "start": "babel-node -- src/index.js",
     "deploy-now": "now `sed 's/#.*$//;/^\\s*$/d;s/^/-e /' .env.prod`"
   },
   "dependencies": {
