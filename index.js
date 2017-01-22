@@ -101,11 +101,15 @@ function* serveDoc(docId, localPart, req, res) {
     sendToLogin(req, res)
     return
   } else if (hasRights === true) {
-    const file = yield run(s3.readFile, path.join(docRoot, localPart))
-    res.set('Content-Type', file.ContentType)
-    res.set('Content-Length', file.ContentLength)
-    res.send(file.Body)
-    return
+    yield run(function*() {
+      const file = yield run(s3.readFile, path.join(docRoot, localPart))
+      res.set('Content-Type', file.ContentType)
+      res.set('Content-Length', file.ContentLength)
+      res.send(file.Body)
+    }).catch((e) => {
+      if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
+      else throw e
+    })
   } else if (hasRights === false) {
     res.status(401).send('You do not have rights to access these docs.')
   }
