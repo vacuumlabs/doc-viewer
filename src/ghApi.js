@@ -38,6 +38,8 @@ export function* accessToken(ghClient, code) {
 
 
 function* get(token, url) {
+  if (token == null) throw unauthorized
+
   const response = yield fetch(url, {
     headers: headers(token),
     method: "GET",

@@ -25,12 +25,8 @@ function sendToLogin(req, res) {
 }
 
 function* checkRights(req, repo) {
-  if (repo == null) return true
-
-  const token = req.cookies.access_token
-  if (!token) throw unauthorized
-
-  return yield run(amICollaborator, token, c.ghOrganization, repo)
+  return repo == null || (yield run(amICollaborator, req.cookies.access_token,
+                                   c.ghOrganization, repo))
 }
 
 function* login(req, res) {
