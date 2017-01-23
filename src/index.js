@@ -4,7 +4,7 @@ import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import c from './config'
-import {authorizeUrl, accessToken, amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
+import {authorizeUrl, accessToken, amICollaborator as _amICollaborator, unauthorized} from './ghApi.js'
 import memoize from './memoize'
 import createS3Client from './s3.js'
 
@@ -24,13 +24,9 @@ function* checkRights(req, repo) {
   if (repo == null) return true
 
   const token = req.cookies.access_token
-  if (!token) return {error: errorUnauthorized}
+  if (!token) throw unauthorized
 
   return yield run(amICollaborator, token, c.ghOrganization, repo)
-    .catch((e) => {
-      if (e.error === errorUnauthorized) return e
-      else throw(e)
-    })
 }
 
 function* login(req, res) {
@@ -72,24 +68,26 @@ function* serveDoc(docId, localPart, req, res) {
     else throw e
   })
 
-  const hasRights = yield run(checkRights, req, config.read)
+  yield run(function*() {
+    const hasRights = yield run(checkRights, req, config.read)
 
-  if (hasRights.error) {
-    sendToLogin(req, res)
-    return
-  } else if (hasRights === true) {
-    yield run(function*() {
-      const file = yield run(s3.readFile, path.join(docRoot, localPart))
-      res.set('Content-Type', file.ContentType)
-      res.set('Content-Length', file.ContentLength)
-      res.send(file.Body)
-    }).catch((e) => {
-      if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
-      else throw e
-    })
-  } else if (hasRights === false) {
-    res.status(401).send('You do not have rights to access these docs.')
-  }
+    if (hasRights) {
+      yield run(function*() {
+        const file = yield run(s3.readFile, path.join(docRoot, localPart))
+        res.set('Content-Type', file.ContentType)
+        res.set('Content-Length', file.ContentLength)
+        res.send(file.Body)
+      }).catch((e) => {
+        if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
+        else throw e
+      })
+    } else {
+      res.status(401).send('You do not have rights to access these docs.')
+    }
+  }).catch((e) => {
+    if (e === unauthorized) sendToLogin(req, res)
+    else throw e
+  })
 }
 
 function* drafts(req, res) {

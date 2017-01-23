@@ -4,12 +4,7 @@ import querystring from 'querystring'
 
 const ghApiUrl = 'https://api.github.com'
 
-const HttpNoContent = 204
-const HttpUnauthorized = 401
-const HttpNotFound = 404
-
-export const errorUnauthorized = 'unauthorized'
-export const errorUnsupportedHttpCode = 'unsupportedHttpCode'
+export const unauthorized = {exception: Symbol('unauthorized')}
 
 function headers(token) {
   const h = {
@@ -48,7 +43,7 @@ function* get(token, url) {
     method: "GET",
   })
 
-  if (response.status === HttpUnauthorized) throw {error: errorUnauthorized}
+  if (response.status === 401) throw unauthorized
 
   return response
 }
@@ -63,9 +58,9 @@ export function* amICollaborator(token, organization, repo) {
   const url = `${ghApiUrl}/repos/${organization}/${repo}/collaborators/${login}`
   const response = yield run(get, token, url)
 
-  if (response.status === HttpNoContent) return true
-  if (response.status === HttpNotFound) return false
+  if (response.status === 204) return true
+  if (response.status === 404) return false
 
   // Unsupported HTTP code
-  throw {error: errorUnsupportedHttpCode, code: response.status}
+  throw new Error(`Github returned unsupported HTTP code ${response.status}.`)
 }
