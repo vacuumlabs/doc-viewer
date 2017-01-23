@@ -44,48 +44,66 @@ function* oauth(req, res) {
   }
 }
 
+const notFound = {error: Symbol('notFound')}
+const notEnoughRights = {error: Symbol('notEnoughRights')}
+
+function sendNotFound(res) {
+  res.status(404).send('Page Not Found')
+}
+
+function sendNotEnoughRights(res) {
+  res.status(401).send('You do not have rights to access these docs.')
+}
+
 const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
-function* serveDoc(docId, localPart, req, res) {
+function absoluteDocPath(docRoot, localPart) {
   localPart = path.normalize(localPart || '/')
   if (localPart.endsWith('/')) localPart += 'index.html'
+  if (localPart.startsWith('..')) throw notFound
+  return path.join(docRoot, localPart)
+}
 
-  const isReqValid = validDocId(docId) && !localPart.startsWith('..')
-
-  if (!isReqValid) {
-    res.status(404).send('Not Found')
-    return
-  }
-
-  const docRoot = path.join(c.draftPath, docId)
-
+function* readConfig(docRoot) {
   const configFile = path.join(docRoot, 'docs.json')
-  const config = yield run(function*() {
+  return yield run(function*() {
     const file = yield run(s3.readFile, configFile)
     return JSON.parse(file.Body.toString())
   }).catch((e) => {
     if (e.code === 'NoSuchKey') return {}
     else throw e
   })
+}
 
+function* serveS3File(res, path) {
   yield run(function*() {
+    const file = yield run(s3.readFile, path)
+    res.set('Content-Type', file.ContentType)
+    res.set('Content-Length', file.ContentLength)
+    res.send(file.Body)
+  }).catch((e) => {
+    if (e.code === 'NoSuchKey') throw notFound
+    else throw e
+  })
+}
+
+function* serveDoc(docId, localPart, req, res) {
+  yield run(function*() {
+    if (!validDocId(docId)) throw notFound
+
+    const docRoot = path.join(c.draftPath, docId)
+    const docPath = absoluteDocPath(docRoot, localPart)
+    const config = yield run(readConfig, docRoot)
     const hasRights = yield run(checkRights, req, config.read)
 
-    if (hasRights) {
-      yield run(function*() {
-        const file = yield run(s3.readFile, path.join(docRoot, localPart))
-        res.set('Content-Type', file.ContentType)
-        res.set('Content-Length', file.ContentLength)
-        res.send(file.Body)
-      }).catch((e) => {
-        if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
-        else throw e
-      })
-    } else {
-      res.status(401).send('You do not have rights to access these docs.')
-    }
+    if (!hasRights) throw notEnoughRights
+
+    yield run(serveS3File, res, docPath)
+
   }).catch((e) => {
-    if (e === unauthorized) sendToLogin(req, res)
+    if (e === notFound) sendNotFound(res)
+    else if (e === unauthorized) sendToLogin(req, res)
+    else if (e === notEnoughRights) sendNotEnoughRights(res)
     else throw e
   })
 }
@@ -99,7 +117,7 @@ function* docs(req, res) {
     const file = yield run(s3.readFile, path.join(c.finalPath, req.params.name))
     return file.Body.toString()
   }).catch((e) => {
-    if (e.code === 'NoSuchKey') res.status(404).send('Not Found')
+    if (e.code === 'NoSuchKey') sendNotFound(res)
     else throw e
   })
 
