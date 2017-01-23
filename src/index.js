@@ -15,8 +15,12 @@ const s3 = createS3Client(c.s3)
 
 app.use(cookieParser())
 
+function saveCookie(res, key, value) {
+  res.cookie(key, value, {httpOnly: true, secure: c.isHttps})
+}
+
 function sendToLogin(req, res) {
-  res.cookie('redirectAfterLogin', req.url, {httpOnly: true, secure: c.isHttps})
+  saveCookie(res, 'redirectAfterLogin', req.url)
   res.redirect(r.login)
 }
 
@@ -37,7 +41,7 @@ function* oauth(req, res) {
   const token = yield run(accessToken, c.ghClient, req.query.code)
 
   if (token) {
-    res.cookie('access_token', token, {httpOnly: true, secure: c.isHttps})
+    saveCookie(res, 'access_token', token)
     res.redirect(req.cookies.redirectAfterLogin || r.index)
   } else {
     res.redirect(r.login)
