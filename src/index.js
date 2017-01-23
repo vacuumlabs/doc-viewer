@@ -7,6 +7,7 @@ import c from './config'
 import {authorizeUrl, accessToken, amICollaborator as _amICollaborator, unauthorized} from './ghApi.js'
 import memoize from './memoize'
 import createS3Client from './s3.js'
+import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
 
 const app = express()
 const {register, runApp} = expressHelpers
@@ -46,14 +47,6 @@ function* oauth(req, res) {
 
 const notFound = {error: Symbol('notFound')}
 const notEnoughRights = {error: Symbol('notEnoughRights')}
-
-function sendNotFound(res) {
-  res.status(404).send('Page Not Found')
-}
-
-function sendNotEnoughRights(res) {
-  res.status(401).send('You do not have rights to access these docs.')
-}
 
 const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
