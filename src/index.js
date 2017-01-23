@@ -1,11 +1,10 @@
-import querystring from 'querystring'
 import path from 'path'
 import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import c from './config'
-import {amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
+import {authorizeUrl, accessToken, amICollaborator as _amICollaborator, errorUnauthorized} from './ghApi.js'
 import memoize from './memoize'
 import createS3Client from './s3.js'
 
@@ -35,36 +34,14 @@ function* checkRights(req, repo) {
 }
 
 function* login(req, res) {
-  const url = 'https://github.com/login/oauth/authorize'
-  const query = {
-    scope: 'repo',
-    client_id: c.ghClient.id,
-  }
-  res.redirect(`${url}?${querystring.stringify(query)}`)
+  res.redirect(authorizeUrl(c.ghClient))
 }
 
 function* oauth(req, res) {
-  const url = 'https://github.com/login/oauth/access_token'
+  const token = yield run(accessToken, c.ghClient, req.query.code)
 
-  const authParams = {
-    client_id: c.ghClient.id,
-    client_secret: c.ghClient.secret,
-    code: req.query.code,
-    accept: 'json'
-  }
-
-  const authRes = yield fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(authParams)
-  })
-
-  const authJSON = yield authRes.json()
-  if (authJSON.access_token) {
-    res.cookie('access_token', authJSON.access_token, {httpOnly: true})
+  if (token) {
+    res.cookie('access_token', token, {httpOnly: true, secure: c.isHttps})
     res.redirect(req.cookies.redirectAfterLogin || r.index)
   } else {
     res.redirect(r.login)

@@ -1,5 +1,6 @@
 import {run} from 'yacol'
 import fetch from 'node-fetch'
+import querystring from 'querystring'
 
 const ghApiUrl = 'https://api.github.com'
 
@@ -11,12 +12,35 @@ export const errorUnauthorized = 'unauthorized'
 export const errorUnsupportedHttpCode = 'unsupportedHttpCode'
 
 function headers(token) {
-  return {
+  const h = {
     'Accept': 'application/json',
-    'Authorization': `token ${token}`,
     'Content-Type': 'application/json',
   }
+  if (token) h['Authorization'] = `token ${token}`
+  return h
 }
+
+export function authorizeUrl(ghClient) {
+  const url = 'https://github.com/login/oauth/authorize'
+  const query = {
+    scope: 'repo',
+    client_id: ghClient.client_id,
+  }
+  return `${url}?${querystring.stringify(query)}`
+}
+
+export function* accessToken(ghClient, code) {
+  const url = 'https://github.com/login/oauth/access_token'
+  const authParams = {...ghClient, code, accept: 'json'}
+  const authResult = yield fetch(url, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(authParams),
+  })
+
+  return (yield authResult.json()).access_token
+}
+
 
 function* get(token, url) {
   const response = yield fetch(url, {

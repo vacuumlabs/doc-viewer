@@ -8,8 +8,8 @@ export default transenv()(({str, bool}) => {
     authorizationMaxAge: str('AUTHORIZATION_MAX_AGE'),
     cacheMaxRecords: 1000,
     ghClient: {
-      id: str('GH_CLIENT_ID'),
-      secret: str('GH_CLIENT_SECRET'),
+      client_id: str('GH_CLIENT_ID'),
+      client_secret: str('GH_CLIENT_SECRET'),
     },
     ghOrganization: str('GH_ORGANIZATION'),
     s3: {
