@@ -58,10 +58,13 @@ export function* aliasToDocId(alias) {
   return file.Body.toString()
 }
 
+// Loading files from S3 with inifinite caching. Use only for immutable files.
+const loadDoc = memoize(loadFile, c.cacheMaxRecords, Infinity)
+
 export function* serveDoc(docId, localPart, req, res) {
   const docRoot = getDocRoot(docId)
   const docPath = absoluteDocPath(docRoot, localPart)
-  const filePromise = run(loadFile, docPath)
+  const filePromise = run(loadDoc, docPath)
   const config = yield run(readConfig, docRoot)
   const hasRights = yield run(checkRights, req.cookies.access_token, config.read)
 
