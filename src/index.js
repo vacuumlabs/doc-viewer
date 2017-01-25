@@ -7,6 +7,7 @@ import createS3Client from './s3.js'
 import {sendNotFound} from './errorPages.js'
 import {login, oauth} from './authorize.js'
 import {notFound, aliasToDocId, serveDoc} from './serveDoc.js'
+import {isIdValid, uuid} from './id.js'
 import r from './routes.js'
 
 const app = express()
@@ -39,7 +40,7 @@ function assertApiKey(req, res) {
 function* upload(req, res) {
   if (!assertApiKey(req, res)) return
 
-  const docId = Math.floor((Date.now() + Math.random())*1000).toString(36)
+  const docId = uuid()
   yield run(s3.unzip, req, path.join(c.draftPath, docId))
   res.status(200).send(docId)
 }
@@ -48,7 +49,7 @@ function* alias(req, res) {
   if (!assertApiKey(req, res)) return
 
   const {docId, name} = req.params
-  const isReqValid = validDocId(docId) && validDocId(name)
+  const isReqValid = isIdValid(docId) && isIdValid(name)
   if (!isReqValid) {
     res.status(400).send('Invalid request.')
     return

@@ -4,6 +4,7 @@ import unzip2 from 'unzip2'
 import s3 from '@faceleg/s3'
 import s3fs from 's3fs'
 import p from 'path'
+import {uuid} from './id.js'
 
 export default function createClient(options) {
   const s3fsClient = new s3fs(options.bucket, {
@@ -29,7 +30,7 @@ export default function createClient(options) {
   }
 
   function* unzip(stream, path) {
-    const tmpId = Math.floor((Date.now() + Math.random())*1000).toString(36)
+    const tmpId = uuid()
     const tmpFolder = p.join(os.tmpdir(), tmpId)
 
     const extract = unzip2.Extract({path: tmpFolder})

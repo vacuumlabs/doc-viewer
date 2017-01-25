@@ -6,6 +6,7 @@ import {sendToLogin} from './authorize.js'
 import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
 import {amICollaborator as _amICollaborator, unauthorized} from './ghApi.js'
 import createS3Client from './s3.js'
+import {isIdValid} from './id.js'
 
 const s3 = createS3Client(c.s3)
 
@@ -21,7 +22,7 @@ function* checkRights(token, repo) {
 }
 
 function getDocRoot(docId) {
-  if (!(docId && docId.match(/^[a-zA-Z0-9-_]*$/))) throw notFound
+  if (!isIdValid(docId)) throw notFound
   return path.join(c.draftPath, docId)
 }
 
