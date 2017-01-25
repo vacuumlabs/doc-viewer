@@ -1,3 +1,4 @@
+import createS3Client from './s3.js'
 import transenv from 'transenv'
 
 export default transenv()(({str, bool}) => {
@@ -12,12 +13,12 @@ export default transenv()(({str, bool}) => {
       client_secret: str('GH_CLIENT_SECRET'),
     },
     ghOrganization: str('GH_ORGANIZATION'),
-    s3: {
+    s3: createS3Client({
       region: str('REGION'),
       bucket: str('BUCKET'),
       accessKeyId: str('ACCESS_KEY_ID'),
       secretAccessKey: str('SECRET_ACCESS_KEY'),
-    },
+    }),
     draftPath: 'draft',
     finalPath: 'final',
   }

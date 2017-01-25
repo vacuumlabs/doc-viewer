@@ -3,7 +3,6 @@ import express from 'express'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import c from './config'
-import createS3Client from './s3.js'
 import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
 import {sendToLogin, login, oauth} from './authorize.js'
 import {aliasToDocId, serveDoc} from './serveDoc.js'
@@ -13,7 +12,7 @@ import r from './routes.js'
 
 const app = express()
 const {register, runApp} = expressHelpers
-const s3 = createS3Client(c.s3)
+const s3 = c.s3
 
 app.use(cookieParser())
 

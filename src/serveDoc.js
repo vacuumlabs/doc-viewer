@@ -3,11 +3,10 @@ import path from 'path'
 import c from './config'
 import memoize from './memoize.js'
 import {amICollaborator as _amICollaborator} from './ghApi.js'
-import createS3Client from './s3.js'
 import {isIdValid} from './id.js'
 import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 
-const s3 = createS3Client(c.s3)
+const s3 = c.s3
 
 const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
 
