@@ -4,10 +4,11 @@ import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import c from './config'
 import createS3Client from './s3.js'
-import {sendNotFound} from './errorPages.js'
-import {login, oauth} from './authorize.js'
-import {notFound, aliasToDocId, serveDoc} from './serveDoc.js'
+import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
+import {sendToLogin, login, oauth} from './authorize.js'
+import {aliasToDocId, serveDoc} from './serveDoc.js'
 import {isIdValid, uuid} from './id.js'
+import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 import r from './routes.js'
 
 const app = express()
@@ -21,12 +22,8 @@ function* drafts(req, res) {
 }
 
 function* docs(req, res) {
-  yield run(function*() {
-    const docId = yield run(aliasToDocId, req.params.name)
-    yield run(serveDoc, docId, req.params[0], req, res)
-  }).catch((e) => {
-    if (e === notFound) sendNotFound(res)
-  })
+  const docId = yield run(aliasToDocId, req.params.name)
+  yield run(serveDoc, docId, req.params[0], req, res)
 }
 
 function assertApiKey(req, res) {
@@ -65,15 +62,25 @@ function* index(req, res) {
 
 const esc = (s) => s.replace('$', '\\$')
 
-register(app, 'get', esc(r.index), index)
-register(app, 'get', esc(r.login), login)
-register(app, 'get', esc(r.oauth), oauth)
-register(app, 'get', esc(r.drafts), drafts)
+// Wrapper for web requests to handle exceptions from standard flow.
+const web = (handler) => function* (req, res) {
+  yield run(handler, req, res).catch((e) => {
+    if (e === notFound) sendNotFound(res)
+    else if (e === unauthorized) sendToLogin(req, res)
+    else if (e === notEnoughRights) sendNotEnoughRights(res)
+    else throw e
+  })
+}
+
+register(app, 'get', esc(r.index), web(index))
+register(app, 'get', esc(r.login), web(login))
+register(app, 'get', esc(r.oauth), web(oauth))
+register(app, 'get', esc(r.drafts), web(drafts))
 register(app, 'post', esc(r.upload), upload)
 register(app, 'put', esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.
-register(app, 'get', r.docs, docs)
+register(app, 'get', r.docs, web(docs))
 
 run(function* () {
   run(runApp)

@@ -1,10 +1,9 @@
 import {run} from 'yacol'
 import fetch from 'node-fetch'
 import querystring from 'querystring'
+import {unauthorized} from './exceptions.js'
 
 const ghApiUrl = 'https://api.github.com'
-
-export const unauthorized = {exception: Symbol('unauthorized')}
 
 function headers(token) {
   const h = {
@@ -35,7 +34,6 @@ export function* accessToken(ghClient, code) {
 
   return (yield authResult.json()).access_token
 }
-
 
 function* get(token, url) {
   if (token == null) throw unauthorized
