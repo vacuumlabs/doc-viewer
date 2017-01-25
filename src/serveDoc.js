@@ -27,7 +27,7 @@ function absoluteDocPath(docRoot, localPart) {
   return path.join(docRoot, localPart)
 }
 
-function* readConfig(docRoot) {
+function* _readConfig(docRoot) {
   const configFile = path.join(docRoot, 'docs.json')
   return yield run(function*() {
     const file = yield run(s3.readFile, configFile)
@@ -37,6 +37,8 @@ function* readConfig(docRoot) {
     else throw e
   })
 }
+
+const readConfig = memoize(_readConfig, c.cacheMaxRecords, Infinity)
 
 function* loadFile(path) {
   return yield run(s3.readFile, path).catch((e) => {
