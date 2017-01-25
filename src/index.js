@@ -6,7 +6,7 @@ import c from './config'
 import createS3Client from './s3.js'
 import {sendNotFound} from './errorPages.js'
 import {login, oauth} from './authorize.js'
-import {serveDoc} from './serveDoc.js'
+import {notFound, aliasToDocId, serveDoc} from './serveDoc.js'
 import r from './routes.js'
 
 const app = express()
@@ -20,15 +20,12 @@ function* drafts(req, res) {
 }
 
 function* docs(req, res) {
-  const docId = yield run(function*() {
-    const file = yield run(s3.readFile, path.join(c.finalPath, req.params.name))
-    return file.Body.toString()
+  yield run(function*() {
+    const docId = yield run(aliasToDocId, req.params.name)
+    yield run(serveDoc, docId, req.params[0], req, res)
   }).catch((e) => {
-    if (e.code === 'NoSuchKey') sendNotFound(res)
-    else throw e
+    if (e === notFound) sendNotFound(res)
   })
-
-  yield run(serveDoc, docId, req.params[0], req, res)
 }
 
 function assertApiKey(req, res) {

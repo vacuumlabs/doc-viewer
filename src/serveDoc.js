@@ -11,8 +11,8 @@ const s3 = createS3Client(c.s3)
 
 const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
 
-const notFound = {error: Symbol('notFound')}
-const notEnoughRights = {error: Symbol('notEnoughRights')}
+export const notFound = {error: Symbol('notFound')}
+export const notEnoughRights = {error: Symbol('notEnoughRights')}
 
 
 function* checkRights(token, repo) {
@@ -49,6 +49,16 @@ function* serveS3File(res, path) {
     res.set('Content-Type', file.ContentType)
     res.set('Content-Length', file.ContentLength)
     res.send(file.Body)
+  }).catch((e) => {
+    if (e.code === 'NoSuchKey') throw notFound
+    else throw e
+  })
+}
+
+export function* aliasToDocId(alias) {
+  return yield run(function*() {
+    const file = yield run(s3.readFile, path.join(c.finalPath, alias))
+    return file.Body.toString()
   }).catch((e) => {
     if (e.code === 'NoSuchKey') throw notFound
     else throw e
