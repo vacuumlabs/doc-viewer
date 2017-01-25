@@ -38,35 +38,32 @@ function* readConfig(docRoot) {
   })
 }
 
-function* serveS3File(res, path) {
-  yield run(function*() {
-    const file = yield run(s3.readFile, path)
-    res.set('Content-Type', file.ContentType)
-    res.set('Content-Length', file.ContentLength)
-    res.send(file.Body)
-  }).catch((e) => {
+function* loadFile(path) {
+  return yield run(s3.readFile, path).catch((e) => {
     if (e.code === 'NoSuchKey') throw notFound
     else throw e
   })
 }
 
+function serveFile(res, file) {
+  res.set('Content-Type', file.ContentType)
+  res.set('Content-Length', file.ContentLength)
+  res.send(file.Body)
+}
+
 export function* aliasToDocId(alias) {
-  return yield run(function*() {
-    const file = yield run(s3.readFile, path.join(c.finalPath, alias))
-    return file.Body.toString()
-  }).catch((e) => {
-    if (e.code === 'NoSuchKey') throw notFound
-    else throw e
-  })
+  const file = yield run(loadFile, path.join(c.finalPath, alias))
+  return file.Body.toString()
 }
 
 export function* serveDoc(docId, localPart, req, res) {
   const docRoot = getDocRoot(docId)
   const docPath = absoluteDocPath(docRoot, localPart)
+  const filePromise = run(loadFile, docPath)
   const config = yield run(readConfig, docRoot)
   const hasRights = yield run(checkRights, req.cookies.access_token, config.read)
 
   if (!hasRights) throw notEnoughRights
 
-  yield run(serveS3File, res, docPath)
+  serveFile(res, (yield filePromise))
 }
