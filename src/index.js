@@ -10,6 +10,8 @@ import {isIdValid, uuid} from './id.js'
 import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 import r from './routes.js'
 
+require('now-logs')(c.apiKey)
+
 const app = express()
 const {register, runApp} = expressHelpers
 const s3 = c.s3
