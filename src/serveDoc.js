@@ -14,11 +14,15 @@ const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authoriza
 const notFound = {error: Symbol('notFound')}
 const notEnoughRights = {error: Symbol('notEnoughRights')}
 
-const validDocId = (docId) => docId && docId.match(/^[a-zA-Z0-9-_]*$/)
 
-function* checkRights(req, repo) {
-  return repo == null || (yield run(amICollaborator, req.cookies.access_token,
+function* checkRights(token, repo) {
+  return repo == null || (yield run(amICollaborator, token,
                                    c.ghOrganization, repo))
+}
+
+function getDocRoot(docId) {
+  if (!(docId && docId.match(/^[a-zA-Z0-9-_]*$/))) throw notFound
+  return path.join(c.draftPath, docId)
 }
 
 function absoluteDocPath(docRoot, localPart) {
@@ -53,12 +57,10 @@ function* serveS3File(res, path) {
 
 export function* serveDoc(docId, localPart, req, res) {
   yield run(function*() {
-    if (!validDocId(docId)) throw notFound
-
-    const docRoot = path.join(c.draftPath, docId)
+    const docRoot = getDocRoot(docId)
     const docPath = absoluteDocPath(docRoot, localPart)
     const config = yield run(readConfig, docRoot)
-    const hasRights = yield run(checkRights, req, config.read)
+    const hasRights = yield run(checkRights, req.cookies.access_token, config.read)
 
     if (!hasRights) throw notEnoughRights
 
