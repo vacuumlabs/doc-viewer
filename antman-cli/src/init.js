@@ -7,5 +7,5 @@ export function init(name) {
     console.error(`Directory ${name} already exists.`)
     process.exit(1)
   }
-  exec(`git clone --depth=1 --branch=master ${initRepo} ${name} && rm -rf !$/.git`)
+  exec(`git clone --depth=1 --branch=master ${initRepo} ${name} && rm -rf ${name}/.git && git init ${name}`)
 }
