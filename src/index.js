@@ -9,6 +9,8 @@ import {aliasToDocId, serveDoc} from './serveDoc.js'
 import {isIdValid, uuid} from './id.js'
 import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 import r from './routes.js'
+import home from './home.js'
+import {renderToString} from 'react-dom/server';
 
 require('now-logs')(c.apiKey)
 
@@ -58,7 +60,7 @@ function* alias(req, res) {
 }
 
 function* index(req, res) {
-  res.send('Nothing interesting here.')
+  res.send(renderToString(home()))
 }
 
 const esc = (s) => s.replace('$', '\\$')
