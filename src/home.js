@@ -23,6 +23,13 @@ const sampleCardsData = [
     //updatedAt: "20160307T14:23:21",
     link: "/tech-book/",
   },
+  {
+    title: "Assessment and Interview Guide",
+    description: `Set of guides, tips, and interview questions for our technical assessments.`,
+    icon: "fa-line-chart",
+    //updatedAt: "20160307T14:23:21",
+    link: "/tech-book/",
+  },
 ]
 
 export default () => (
