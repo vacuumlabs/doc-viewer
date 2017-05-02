@@ -24,7 +24,7 @@ const sampleCardsData = [
     link: "/tech-book/",
   },
   {
-    title: "Assessment and Interview Guide",
+    title: "Assessment and Interview",
     description: `Set of guides, tips, and interview questions for our technical assessments.`,
     icon: "user-plus",
     //updatedAt: "20160307T14:23:21",
