@@ -10,6 +10,12 @@ const sampleCardsData = [
     link: "/vacuum-book/",
   },
   {
+    title: "House Rules — Radlinského",
+    description: "House rules for Radlinského 10 office.",
+    icon: "fa-home",
+    link: "/house-rules-radlinskeho/",
+  },
+  {
     title: "Coding Tips",
     description: `This public handbook provides useful tips and tricks for programmers.`,
     icon: "fa-code",
