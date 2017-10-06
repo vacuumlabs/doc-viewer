@@ -36,6 +36,12 @@ const sampleCardsData = [
     //updatedAt: "20160307T14:23:21",
     link: "/assessment/",
   },
+  {
+    title: "HQ",
+    description: "Relevant information for the VacuumLabs' management.",
+    icon: "fa-line-chart",
+    link: "/hq/",
+  },
 ]
 
 export default () => (
