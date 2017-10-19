@@ -32,7 +32,7 @@ const sampleCardsData = [
   {
     title: "Assessment and Interview",
     description: `Set of guides, tips, and interview questions for our technical assessments.`,
-    icon: "user-plus",
+    icon: "fa-user-plus",
     //updatedAt: "20160307T14:23:21",
     link: "/assessment/",
   },
@@ -73,7 +73,7 @@ const Cards = ({cards}) => (
 const Card = ({title, description, icon, updatedAt, link}) => (
   <a href={link} className="card">
     <header className="card__header">
-      <i className={`fa ${icon} card__header__icon`} />
+      {icon && <i className={`fa ${icon} card__header__icon`} />}
       <h2 className="card__header__title">{title}</h2>
     </header>
     {description && <p className="card__description">{description}</p>}
