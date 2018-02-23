@@ -1,7 +1,7 @@
 import React from 'react'
 export default () => (
 <style>{`
-@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(https://use.fontawesome.com/releases/v5.0.6/css/all.css);
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
@@ -300,6 +300,9 @@ a:hover, a:focus, a:active {
   display: inline-block;
   margin: 0;
   font-size: 1.3rem;
+}
+
+.card__header__title {
   font-weight: 500;
 }
 
