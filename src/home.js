@@ -16,6 +16,12 @@ const sampleCardsData = [
     link: "/house-rules-radlinskeho/",
   },
   {
+    title: "House Rules — Prague",
+    description: "House rules for our Prague office.",
+    icon: "fa-home",
+    link: "/house-rules-prague/",
+  },
+  {
     title: "Coding Tips",
     description: `This public handbook provides useful tips and tricks for programmers.`,
     icon: "fa-code",
@@ -41,6 +47,18 @@ const sampleCardsData = [
     description: "Relevant information for the VacuumLabs' management.",
     icon: "fa-line-chart",
     link: "/hq/",
+  },
+  {
+    title: "ReactiveConf",
+    description: "How to organize ReactiveConf.",
+    icon: "fa-react",
+    link: "/reactiveconf/",
+  },
+  {
+    title: "ReactiveMeetups",
+    description: "How to organize ReactiveMeetups.",
+    icon: "fa-react",
+    link: "/reactivemeetups/",
   },
 ]
 
