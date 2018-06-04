@@ -1,5 +1,6 @@
 import path from 'path'
 import express from 'express'
+import favicon from 'serve-favicon'
 import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import c from './config'
@@ -19,6 +20,7 @@ const {register, runApp} = expressHelpers
 const s3 = c.s3
 
 app.use(cookieParser())
+app.use(favicon(path.join(__dirname, '../assets', 'favicon.ico')))
 
 function* drafts(req, res) {
   yield run(serveDoc, req.params.docId, req.params[0], req, res)
