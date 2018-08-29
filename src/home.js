@@ -16,6 +16,12 @@ const sampleCardsData = [
     link: "/house-rules-radlinskeho/",
   },
   {
+    title: "House Rules — Košice",
+    description: "House rules for Košice office.",
+    icon: "fa fa-home",
+    link: "/house-rules-kosice/",
+  },
+  {
     title: "House Rules — Prague",
     description: "House rules for our Prague office.",
     icon: "fa fa-home",
