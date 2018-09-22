@@ -41,6 +41,12 @@ const sampleCardsData = [
     link: "/coding-tips/",
   },
   {
+    title: "Management Tips",
+    description: "VacuumLabs Management tips, tricks, guidelines, and best practices.",
+    icon: "fas fa-tasks",
+    link: "/management-tips/",
+  },
+  {
     title: "PM Handbook",
     description: "VacuumLabs PM tips, tricks, guidelines, and best practices.",
     icon: "fas fa-tasks",
