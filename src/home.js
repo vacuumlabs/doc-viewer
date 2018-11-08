@@ -90,6 +90,12 @@ const sampleCardsData = [
     icon: "fab fa-react",
     link: "/reactivemeetups/",
   },
+  {
+    title: "Finance Handbook",
+    description: "No money, no honey",
+    icon: "fab fa-react",
+    link: "/finance-handbook/",
+  },
 ]
 
 export default () => (
