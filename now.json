@@ -1,0 +1,19 @@
+{
+    "alias": ["we.vacuumlabs.com"],
+
+    "env": {
+        "NODE_ENV":"production",
+        "HTTPS": "true",
+        "HOST": "we.vacuumlabs.com",
+        "PORT": "443",
+        "AUTHORIZATION_MAX_AGE": "60000",
+        "API_KEY": "F35zVQJpnKs7tJbtx2zU6TGG",
+        "GH_CLIENT_ID": "@gh-client-id",
+        "GH_CLIENT_SECRET": "@gh-client-secret",
+        "GH_ORGANIZATION": "vacuumlabs",
+        "REGION": "us-west-1",
+        "BUCKET": "vl-antman-us",
+        "ACCESS_KEY_ID": "@antman-key-id",
+        "SECRET_ACCESS_KEY": "@antman-secret-key"
+    }
+}
