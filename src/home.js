@@ -96,6 +96,12 @@ const sampleCardsData = [
     icon: "fab fa-react",
     link: "/finance-handbook/",
   },
+  {
+    title: "Travel Tips",
+    description: "How to survive jet lag and much more",
+    icon: "fas fa-plane",
+    link: "/travel-tips/",
+  },
 ]
 
 export default () => (
