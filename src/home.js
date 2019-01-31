@@ -98,7 +98,7 @@ const sampleCardsData = [
   },
   {
     title: "Travel Tips",
-    description: "How to survive jet lag and much more",
+    description: "How to survive jet lag and much more.",
     icon: "fas fa-plane",
     link: "/travel-tips/",
   },
