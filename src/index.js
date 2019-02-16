@@ -16,6 +16,20 @@ import {renderToString} from 'react-dom/server';
 require('now-logs')(c.apiKey)
 
 const app = express()
+
+app.set('trust proxy', 'loopback')
+
+if (c.isHttps) {
+  app.use((req, res, next) => {
+    if (!req.secure) {
+      res.redirect(301, `https://${req.hostname}${req.url}`)
+    } else {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000')
+      next()
+    }
+  })
+}
+
 const {register, runApp} = expressHelpers
 const s3 = c.s3
 
