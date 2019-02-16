@@ -5,13 +5,11 @@ export default transenv()(({str, bool}) => {
   return {
     isHttps: bool('HTTPS'),
     apiKey: str('API_KEY'),
+    ssoKey: str('VL_SSO_KEY'),
+    ssoUrl: str('VL_SSO_URL'),
     port: str('PORT'),
     authorizationMaxAge: str('AUTHORIZATION_MAX_AGE'),
     cacheMaxRecords: 1000,
-    ghClient: {
-      client_id: str('GH_CLIENT_ID'),
-      client_secret: str('GH_CLIENT_SECRET'),
-    },
     ghOrganization: str('GH_ORGANIZATION'),
     s3: createS3Client({
       region: str('REGION'),
