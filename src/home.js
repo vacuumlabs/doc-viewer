@@ -102,6 +102,12 @@ const sampleCardsData = [
     icon: "fas fa-plane",
     link: "/travel-tips/",
   },
+  {
+    title: "Asciidoctor Cheatsheet",
+    description: "The ultimate copy & paste guide to writing Asciidoctor documents.",
+    icon: "fas fa-pencil-alt",
+    link: "/asciidoctor-cheatsheet/"
+  },
 ]
 
 export default () => (
