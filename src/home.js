@@ -42,13 +42,13 @@ const sampleCardsData = [
   },
   {
     title: "Management Tips",
-    description: "VacuumLabs Management tips, tricks, guidelines, and best practices.",
+    description: "Vacuumlabs Management tips, tricks, guidelines, and best practices.",
     icon: "fas fa-tasks",
     link: "/management-tips/",
   },
   {
     title: "PM Handbook",
-    description: "VacuumLabs PM tips, tricks, guidelines, and best practices.",
+    description: "Vacuumlabs PM tips, tricks, guidelines, and best practices.",
     icon: "fas fa-tasks",
     link: "/pm-book/",
   },
@@ -68,7 +68,7 @@ const sampleCardsData = [
   },
   {
     title: "HQ",
-    description: "Relevant information for the VacuumLabs' management.",
+    description: "Relevant information for the Vacuumlabs' management.",
     icon: "fa fa-chart-line",
     link: "/hq/",
   },
@@ -92,9 +92,15 @@ const sampleCardsData = [
   },
   {
     title: "Finance Handbook",
-    description: "No money, no honey",
+    description: "No money, no honey.",
     icon: "fab fa-react",
     link: "/finance-handbook/",
+  },
+  {
+    title: "Marketing & Design",
+    description: "Vacuumlabs brand manual.",
+    icon: "fas fa-bullhorn",
+    link: "/marketing-design/"
   },
   {
     title: "Travel Tips",
