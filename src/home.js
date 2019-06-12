@@ -28,6 +28,12 @@ const sampleCardsData = [
     link: "/house-rules-prague/",
   },
   {
+    title: "House Rules — Brno",
+    description: "House rules for Brno office.",
+    icon: "fa fa-home",
+    link: "/house-rules-brno/",
+  },
+  {
     title: "House Rules — London",
     description: "House rules for our London office.",
     icon: "fa fa-home",
