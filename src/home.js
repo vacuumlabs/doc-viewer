@@ -120,6 +120,13 @@ const sampleCardsData = [
     icon: "fas fa-pencil-alt",
     link: "/asciidoctor-cheatsheet/"
   },
+  {
+    title: "ReportBot",
+    description: "ReportBot collecting reports from Slack.",
+    icon: "fab fa-slack",
+    link: "https://report.vacuumlabs.com/",
+    newPage: true,
+  },
 ]
 
 export default () => (
@@ -148,8 +155,8 @@ const Cards = ({cards}) => (
   </section>
 )
 
-const Card = ({title, description, icon, updatedAt, link}) => (
-  <a href={link} className="card">
+const Card = ({title, description, icon, updatedAt, link, newPage}) => (
+  <a href={link} className="card" {...(newPage && {target: "_blank", rel: "noopener noreferrer"})}>
     <header className="card__header">
       {icon && <i className={`${icon} card__header__icon`} />}
       <h2 className="card__header__title">{title}</h2>
