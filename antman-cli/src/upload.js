@@ -1,5 +1,5 @@
 import archiver from 'archiver'
-import fs from 'fs-promise'
+import fs from 'fs-extra'
 import path from 'path'
 import {run} from 'yacol'
 import request from './request.js'
