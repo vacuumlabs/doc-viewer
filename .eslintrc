@@ -102,7 +102,7 @@
     "react/jsx-boolean-value": 1,
     "react/jsx-curly-spacing": [1, "never"],
     "react/jsx-equals-spacing": [1, "never"],
-    "react/jsx-space-before-closing": [1, "always"],
+    "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],
     "react/jsx-quotes": 0,
     "jsx-quotes": [1, "prefer-double"],
     "react/jsx-no-undef": 2,
@@ -118,13 +118,12 @@
     "react/react-in-jsx-scope": 2,
     "react/self-closing-comp": 1,
     // Not ready yet. "react/sort-comp": 1,
-    "react/wrap-multilines": 1,
     "import/no-unresolved": [2, {"commonjs": true, "amd": true}],
     "import/named": 2,
     "import/namespace": 2,
     "import/default": 0,
     "import/export": 2,
-    "babel/arrow-parens": [1, "always"],
+    "arrow-parens": [1, "always"],
   },
   "plugins": [
     "react",
@@ -138,8 +137,12 @@
     "Promise": true,
     "Map": true,
     "Set": true,
+    "Symbol": true,
   },
-  "ecmaFeatures": {
-    "jsx": true
-  }
+  "parserOptions": {
+    "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
+    }
+},
 }

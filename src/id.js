@@ -3,5 +3,5 @@ export function isIdValid(id) {
 }
 
 export function uuid() {
-  return Math.floor((Date.now() + Math.random())*1000).toString(36)
+  return Math.floor((Date.now() + Math.random()) * 1000).toString(36)
 }

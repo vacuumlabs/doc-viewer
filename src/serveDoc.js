@@ -4,15 +4,14 @@ import c from './config'
 import memoize from './memoize.js'
 import {amICollaborator as _amICollaborator} from './ghApi.js'
 import {isIdValid} from './id.js'
-import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
+import {notFound, notEnoughRights} from './exceptions.js'
 
 const s3 = c.s3
 
 const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
 
 function* checkRights(token, repo) {
-  return repo == null || (yield run(amICollaborator, token,
-                                   c.ghOrganization, repo))
+  return repo == null || (yield run(amICollaborator, token, c.ghOrganization, repo))
 }
 
 function getDocRoot(docId) {

@@ -1,4 +1,3 @@
-import {run} from 'yacol'
 import c from './config'
 import r from './routes.js'
 import url from 'url'

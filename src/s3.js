@@ -1,13 +1,12 @@
-import {run} from 'yacol'
 import os from 'os'
 import unzip2 from 'unzip2'
 import s3 from '@faceleg/s3'
-import s3fs from 's3fs'
+import S3FS from 's3fs'
 import p from 'path'
 import {uuid} from './id.js'
 
 export default function createClient(options) {
-  const s3fsClient = new s3fs(options.bucket, {
+  const s3fsClient = new S3FS(options.bucket, {
     region: options.region,
     accessKeyId: options.accessKeyId,
     secretAccessKey: options.secretAccessKey,
