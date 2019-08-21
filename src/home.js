@@ -71,6 +71,12 @@ const sampleCardsData = [
     link: '/tech-book/',
   },
   {
+    title: 'HQ',
+    description: 'Relevant information for the Vacuumlabs\' management.',
+    icon: 'fa fa-chart-line',
+    link: '/hq/',
+  },
+  {
     title: 'Assessment and Interview',
     description: 'Set of guides, tips, and interview questions for our technical assessments.',
     icon: 'fa fa-user-plus',
@@ -78,10 +84,10 @@ const sampleCardsData = [
     link: '/assessment/',
   },
   {
-    title: 'HQ',
-    description: 'Relevant information for the Vacuumlabs\' management.',
-    icon: 'fa fa-chart-line',
-    link: '/hq/',
+    title: 'Project Estimation',
+    description: 'How we estimate projects at Vacuumlabs.',
+    icon: 'fa fa-clock',
+    link: '/estimation-book/',
   },
   {
     title: 'Marketing & Design',
