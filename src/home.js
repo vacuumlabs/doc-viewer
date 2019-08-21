@@ -127,6 +127,13 @@ const sampleCardsData = [
     link: 'https://report.vacuumlabs.com/',
     newPage: true,
   },
+  {
+    title: "Company flat",
+    description: "How things work at our company flat",
+    icon: "fab fa-home",
+    link: "/company_flat/",
+    newPage: true,
+  },
 ]
 
 export default () => (
