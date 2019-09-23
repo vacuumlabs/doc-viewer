@@ -76,6 +76,7 @@ function* alias(req, res) {
 }
 
 function* index(req, res) {
+  if (req.cookies.access_token == null) throw unauthorized
   res.send(renderToString(home()))
 }
 
