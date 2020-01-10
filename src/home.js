@@ -4,10 +4,16 @@ import Style from './app.style'
 const sampleCardsData = [
   {
     title: 'Vacuum Handbook',
-    description: 'The first thing you should read when you start working at VacuumLabs.',
+    description: 'The first thing you should read when you start working at Vacuumlabs.',
     icon: 'fa fa-users',
     //updatedAt: '20160107T14:39:21',
     link: '/vacuum-book/',
+  },
+  {
+    title: 'Security Handbook',
+    description: 'Security is always excessive until it’s not enough.',
+    icon: 'fa fa-lock',
+    link: '/security-book/',
   },
   {
     title: 'House Rules — Radlinského',
