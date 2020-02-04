@@ -91,6 +91,12 @@ const sampleCardsData = [
     link: '/house-rules-brno/',
   },
   {
+    title: 'House Rules — Budapest',
+    description: 'House rules for Budapest office.',
+    icon: 'fa fa-building',
+    link: '/house-rules-budapest/',
+  },
+  {
     title: 'Company flats',
     description: 'How things work at our company flats',
     icon: 'fa fa-home',
