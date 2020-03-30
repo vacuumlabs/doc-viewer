@@ -22,6 +22,12 @@ const sampleCardsData = [
     link: '/pm-book/',
   },
   {
+    title: 'Finance Handbook',
+    description: 'No money, no honey.',
+    icon: 'fa fa-euro-sign',
+    link: '/finance-handbook/',
+  },
+  {
     title: 'HQ',
     description: 'Relevant information for the Vacuumlabs\' management.',
     icon: 'fa fa-chart-line',
