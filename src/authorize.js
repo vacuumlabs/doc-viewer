@@ -14,7 +14,7 @@ export function sendToLogin(req, res) {
 
 export function* login(req, res) {
   const oauthUrl = url.format({
-    protocol: req.protocol,
+    protocol: c.isHttps ? 'https' : 'http',
     host: req.headers.host,
     pathname: r.oauth,
   })
