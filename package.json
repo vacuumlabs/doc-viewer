@@ -8,7 +8,9 @@
   "scripts": {
     "start": "babel-node -- src/index.js",
     "deploy-now": "now `sed 's/#.*$//;/^\\s*$/d;s/^/-e /' .env.prod`",
-    "eslint": "eslint -- src"
+    "eslint": "eslint -- src",
+    "prettier": "prettier --write \"src/**/*.js\"",
+    "test": "prettier --check \"src/**/*.js\" && yarn eslint"
   },
   "dependencies": {
     "@babel/cli": "^7.5.5",
