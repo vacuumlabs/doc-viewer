@@ -8,10 +8,16 @@ import {notFound, notEnoughRights} from './exceptions.js'
 
 const s3 = c.s3
 
-const amICollaborator = memoize(_amICollaborator, c.cacheMaxRecords, c.authorizationMaxAge)
+const amICollaborator = memoize(
+  _amICollaborator,
+  c.cacheMaxRecords,
+  c.authorizationMaxAge,
+)
 
 function* checkRights(token, repo) {
-  return repo == null || (yield run(amICollaborator, token, c.ghOrganization, repo))
+  return (
+    repo == null || (yield run(amICollaborator, token, c.ghOrganization, repo))
+  )
 }
 
 function getDocRoot(docId) {
@@ -28,7 +34,7 @@ function absoluteDocPath(docRoot, localPart) {
 
 function* _readConfig(docRoot) {
   const configFile = path.join(docRoot, 'docs.json')
-  return yield run(function*() {
+  return yield run(function* () {
     const file = yield run(s3.readFile, configFile)
     return JSON.parse(file.Body.toString())
   }).catch((e) => {
@@ -65,9 +71,13 @@ export function* serveDoc(docId, localPart, req, res) {
   const docPath = absoluteDocPath(docRoot, localPart)
   const filePromise = run(loadDoc, docPath)
   const config = yield run(readConfig, docRoot)
-  const hasRights = yield run(checkRights, req.cookies.access_token, config.read)
+  const hasRights = yield run(
+    checkRights,
+    req.cookies.access_token,
+    config.read,
+  )
 
   if (!hasRights) throw notEnoughRights
 
-  serveFile(res, (yield filePromise))
+  serveFile(res, yield filePromise)
 }
