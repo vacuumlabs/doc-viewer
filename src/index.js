@@ -83,14 +83,15 @@ function* index(req, res) {
 const esc = (s) => s.replace('$', '\\$')
 
 // Wrapper for web requests to handle exceptions from standard flow.
-const web = (handler) => function* (req, res) {
-  yield run(handler, req, res).catch((e) => {
-    if (e === notFound) sendNotFound(res)
-    else if (e === unauthorized) sendToLogin(req, res)
-    else if (e === notEnoughRights) sendNotEnoughRights(res)
-    else throw e
-  })
-}
+const web = (handler) =>
+  function* (req, res) {
+    yield run(handler, req, res).catch((e) => {
+      if (e === notFound) sendNotFound(res)
+      else if (e === unauthorized) sendToLogin(req, res)
+      else if (e === notEnoughRights) sendNotEnoughRights(res)
+      else throw e
+    })
+  }
 
 register(app, 'get', esc(r.index), web(index))
 register(app, 'get', esc(r.login), web(login))
@@ -104,7 +105,5 @@ register(app, 'get', r.docs, web(docs))
 
 run(function* () {
   run(runApp)
-  app.listen(c.port, () =>
-    console.log(`App started on localhost:${c.port}.`)
-  )
+  app.listen(c.port, () => console.log(`App started on localhost:${c.port}.`))
 })

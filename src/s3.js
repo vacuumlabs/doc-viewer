@@ -17,7 +17,7 @@ export default function createClient(options) {
       region: options.region,
       accessKeyId: options.accessKeyId,
       secretAccessKey: options.secretAccessKey,
-    }
+    },
   })
 
   function* readFile(file) {
@@ -40,11 +40,11 @@ export default function createClient(options) {
         const uploader = s3Client.uploadDir({
           localDir: tmpFolder,
           deleteRemoved: true,
-          s3Params: {Bucket: options.bucket, Prefix: path}
+          s3Params: {Bucket: options.bucket, Prefix: path},
         })
         uploader.on('error', (e) => reject(e))
         uploader.on('end', () => resolve())
-      })
+      }),
     )
   }
 
@@ -54,4 +54,3 @@ export default function createClient(options) {
     unzip,
   }
 }
-
