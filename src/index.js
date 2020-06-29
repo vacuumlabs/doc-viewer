@@ -15,7 +15,7 @@ import {renderToString} from 'react-dom/server'
 
 const app = express()
 
-app.set('trust proxy', 'loopback')
+app.enable('trust proxy')
 
 if (c.isHttps) {
   app.use((req, res, next) => {
