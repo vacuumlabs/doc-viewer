@@ -78,8 +78,8 @@ const sampleCardsData = [
     link: '/security-book/',
   },
   {
-    title: 'House Rules — Radlinského',
-    description: 'House rules for Radlinského 10 office.',
+    title: 'House Rules — Digital Park',
+    description: 'House rules for Digital Park office.',
     icon: 'fa fa-building',
     link: '/house-rules-radlinskeho/',
   },
