@@ -18,8 +18,8 @@ const sampleCardsData = [
     link: '/management-tips/',
   },
   {
-    title: 'PM Handbook',
-    description: 'Vacuumlabs PM tips, tricks, guidelines, and best practices.',
+    title: 'IT Delivery (PM Handbook)',
+    description: 'Guidelines concerning our IT project sales & delivery. Must read for all sales, PMs, RMs, tech leads, finance, and legal people.',
     icon: 'fas fa-tasks',
     link: '/pm-book/',
   },
