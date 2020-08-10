@@ -19,7 +19,8 @@ const sampleCardsData = [
   },
   {
     title: 'IT Delivery (PM Handbook)',
-    description: 'Guidelines concerning our IT project sales & delivery. Must read for all sales, PMs, RMs, tech leads, finance, and legal people.',
+    description:
+      'Guidelines concerning our IT project sales & delivery. Must read for all sales, PMs, RMs, tech leads, finance, and legal people.',
     icon: 'fas fa-tasks',
     link: '/pm-book/',
   },
