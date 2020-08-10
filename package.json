@@ -30,7 +30,7 @@
     "s3fs": "^2.5.0",
     "serve-favicon": "^2.5.0",
     "transenv": "^1.0.3",
-    "unzip2": "^0.2.5",
+    "unzipper": "^0.10.11",
     "yacol": "^0.7.0"
   },
   "peerDependencies": {},

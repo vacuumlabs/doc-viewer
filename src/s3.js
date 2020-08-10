@@ -1,5 +1,5 @@
 import os from 'os'
-import unzip2 from 'unzip2'
+import unzipper from 'unzipper'
 import s3 from '@faceleg/s3'
 import S3FS from 's3fs'
 import p from 'path'
@@ -32,7 +32,7 @@ export default function createClient(options) {
     const tmpId = uuid()
     const tmpFolder = p.join(os.tmpdir(), tmpId)
 
-    const extract = unzip2.Extract({path: tmpFolder})
+    const extract = unzipper.Extract({path: tmpFolder})
     stream.pipe(extract)
 
     return yield new Promise((resolve, reject) =>
