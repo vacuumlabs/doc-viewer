@@ -23,7 +23,7 @@
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.19",
     "minimist": "^1.2.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "npm": "^6.14.6",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
