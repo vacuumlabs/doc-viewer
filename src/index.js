@@ -15,6 +15,8 @@ import {renderToString} from 'react-dom/server'
 
 const app = express()
 
+app.use('/static', express.static(path.join(__dirname, 'public')))
+
 app.enable('trust proxy')
 
 if (c.isHttps) {
@@ -75,7 +77,15 @@ function* alias(req, res) {
 
 function* index(req, res) {
   if (req.cookies.access_token == null) throw unauthorized
-  res.send(renderToString(home()))
+  res.send(`
+  <!doctype html>
+    <html>
+    <body>
+    <div id="root">${renderToString(home())}</div>
+    <script src="/static/home.js"></script>
+  </body>
+  </html>
+  `)
 }
 
 const esc = (s) => s.replace('$', '\\$')
