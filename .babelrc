@@ -6,5 +6,8 @@
       }
     }]
   ],
-  "plugins": ["@babel/transform-react-jsx"]
+  "plugins": [
+    "@babel/transform-react-jsx",
+    "@babel/plugin-transform-runtime"
+  ]
 }
