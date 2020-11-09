@@ -280,6 +280,7 @@ a:hover, a:focus, a:active {
 }
 
 .card {
+  outline: none;
   position: relative;
   border-radius: 0 0 3px 3px;
   background-color: #fff;
@@ -287,15 +288,54 @@ a:hover, a:focus, a:active {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.card__submenu__wrapper {
+  position: relative;
+}
+
+.card__submenu {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  transform: scaleY(0.0);
+  transform-origin: top;
+  z-index: 1;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(128, 128, 128, 0.15), 0 2px 4px rgba(128, 128, 128, 0.2);
+  border-radius: 0 0 3px 3px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@media screen and (min-width: 1025px) {
+  .card:hover .card__submenu {
+    transform: scaleY(1.0);
+  }
+  .card:hover .card__header {
+    position: relative;
+    z-index: 2;
+    border-color: #f07;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .card:focus .card__submenu, .card:focus-within .card__submenu {
+    transform: scaleY(1.0);
+  }
+  .card:focus .card__header, .card:focus-within .card__header {
+    position: relative;
+    z-index: 2;
+    border-color: #f07;
+  }
+}
+
 .card:hover {
   box-shadow: 0 7px 14px rgba(128, 128, 128, 0.25), 0 5px 5px rgba(128, 128, 128, 0.22);
 }
 
-.card:hover .card__header {
+.card:hover .card__header, .card__submenu__header:hover {
   border-color: #f07;
 }
 
-.card__header {
+.card__header, .card__submenu__header {
   display: flex;
   width: 100%;
   padding: .5rem 1rem;

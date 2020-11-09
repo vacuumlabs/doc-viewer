@@ -1,6 +1,45 @@
 import React from 'react'
 import Style from './app.style'
 
+const houses = [
+  {
+    title: 'Digital Park',
+    link: '/house-rules-radlinskeho/',
+  },
+  {
+    title: 'Košice',
+    link: '/house-rules-kosice/',
+  },
+  {
+    title: 'Prague',
+    link: '/house-rules-prague/',
+  },
+  {
+    title: 'Brno',
+    link: '/house-rules-brno/',
+  },
+  {
+    title: 'Budapest',
+    link: '/house-rules-budapest/',
+  },
+]
+
+const HousesSubMenu = () => {
+  return (
+    <div className="card__submenu__wrapper">
+      <div className="card__submenu">
+        {houses.map(({title, link}, index) => (
+          <a href={link} key={index}>
+            <header className="card__submenu__header">
+              <h2 className="card__header__title">{title}</h2>
+            </header>
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const sampleCardsData = [
   {
     title: 'Vacuum Handbook',
@@ -79,34 +118,10 @@ const sampleCardsData = [
     link: '/security-book/',
   },
   {
-    title: 'House Rules — Digital Park',
-    description: 'House rules for Digital Park office.',
+    title: 'House Rules',
+    description: 'House rules for offices.',
     icon: 'fa fa-building',
-    link: '/house-rules-radlinskeho/',
-  },
-  {
-    title: 'House Rules — Košice',
-    description: 'House rules for Košice office.',
-    icon: 'fa fa-building',
-    link: '/house-rules-kosice/',
-  },
-  {
-    title: 'House Rules — Prague',
-    description: 'House rules for our Prague office.',
-    icon: 'fa fa-building',
-    link: '/house-rules-prague/',
-  },
-  {
-    title: 'House Rules — Brno',
-    description: 'House rules for Brno office.',
-    icon: 'fa fa-building',
-    link: '/house-rules-brno/',
-  },
-  {
-    title: 'House Rules — Budapest',
-    description: 'House rules for Budapest office.',
-    icon: 'fa fa-building',
-    link: '/house-rules-budapest/',
+    SubMenu: HousesSubMenu,
   },
   {
     title: 'Company flats',
@@ -171,8 +186,32 @@ const Cards = ({cards}) => (
   </section>
 )
 
-const Card = ({title, description, icon, updatedAt, link, newPage}) => (
-  <a
+const CardBase = ({link, newPage, SubMenu, children}) =>
+  SubMenu ? (
+    <div tabIndex={-1} className="card">
+      {children}
+    </div>
+  ) : (
+    <a
+      href={link}
+      className="card"
+      {...(newPage && {target: '_blank', rel: 'noopener noreferrer'})}
+    >
+      {children}
+    </a>
+  )
+
+const Card = ({
+  title,
+  description,
+  icon,
+  updatedAt,
+  link,
+  newPage,
+  SubMenu,
+}) => (
+  <CardBase
+    SubMenu={SubMenu}
     href={link}
     className="card"
     {...(newPage && {target: '_blank', rel: 'noopener noreferrer'})}
@@ -181,7 +220,8 @@ const Card = ({title, description, icon, updatedAt, link, newPage}) => (
       {icon && <i className={`${icon} card__header__icon`} />}
       <h2 className="card__header__title">{title}</h2>
     </header>
+    {SubMenu && <SubMenu />}
     {description && <p className="card__description">{description}</p>}
     {updatedAt && <p className="card__date">Last updated: {updatedAt}</p>}
-  </a>
+  </CardBase>
 )
