@@ -212,7 +212,7 @@ const Card = ({
 }) => (
   <CardBase
     SubMenu={SubMenu}
-    href={link}
+    link={link}
     className="card"
     {...(newPage && {target: '_blank', rel: 'noopener noreferrer'})}
   >
