@@ -7,6 +7,14 @@ const houses = [
     link: '/vacuum-book/office-ba/',
   },
   {
+    title: 'Brno',
+    link: 'vacuum-book/office-brn/',
+  },
+  {
+    title: 'Budapest',
+    link: 'vacuum-book/office-bud/',
+  },
+  {
     title: 'Košice',
     link: 'vacuum-book/office-ke/',
   },
@@ -15,12 +23,8 @@ const houses = [
     link: 'vacuum-book/office-prg/',
   },
   {
-    title: 'Brno',
-    link: 'vacuum-book/office-brn/',
-  },
-  {
-    title: 'Budapest',
-    link: 'vacuum-book/office-bud/',
+    title: 'Prešov',
+    link: 'vacuum-book/office-po/',
   },
 ]
 
