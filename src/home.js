@@ -3,24 +3,24 @@ import Style from './app.style'
 
 const houses = [
   {
-    title: 'Digital Park',
-    link: '/house-rules-radlinskeho/',
+    title: 'Bratislava (The Spot)',
+    link: '/vacuum-book/office-ba/',
   },
   {
     title: 'Košice',
-    link: '/house-rules-kosice/',
+    link: 'vacuum-book/office-ke/',
   },
   {
     title: 'Prague',
-    link: '/house-rules-prague/',
+    link: 'vacuum-book/office-prg/',
   },
   {
     title: 'Brno',
-    link: '/house-rules-brno/',
+    link: 'vacuum-book/office-brn/',
   },
   {
     title: 'Budapest',
-    link: '/house-rules-budapest/',
+    link: 'vacuum-book/office-bud/',
   },
 ]
 
