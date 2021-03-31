@@ -16,7 +16,9 @@ const amICollaborator = memoize(
 
 function* checkRights(token, repo) {
   return (
-    repo == null || (yield run(amICollaborator, token, c.ghOrganization, repo))
+    c.disableAuth ||
+    repo == null ||
+    (yield run(amICollaborator, token, c.ghOrganization, repo))
   )
 }
 
