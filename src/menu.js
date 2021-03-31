@@ -15,7 +15,7 @@ export default [
     submenu: [
       ['Delivery Process', '/vacuum-book/delivery-process/'],
       ['Interviewing Engineers', '/assessment/'],
-      ['Estimating Projects', '/estimation-book/'],
+      ['Estimating Projects', '/vacuum-book/delivery-estimation/'],
       ['Coding Tips', '/coding-tips/'],
     ],
   },
@@ -64,18 +64,13 @@ export default [
     icon: 'fa fa-building',
     submenu: [
       ['Bratislava (The Spot)', '/vacuum-book/office-ba/'],
+      ['Bratislava (Flat)', '/vacuum-book/office-ba-flat/'],
       ['Brno', 'vacuum-book/office-brn/'],
       ['Budapest', 'vacuum-book/office-bud/'],
       ['Košice', 'vacuum-book/office-ke/'],
       ['Prague', 'vacuum-book/office-prg/'],
       ['Prešov', 'vacuum-book/office-po/'],
     ],
-  },
-  {
-    title: 'Company flats',
-    description: 'How things work at our company flats',
-    icon: 'fa fa-home',
-    link: '/company_flats/',
   },
   {
     title: 'ReactiveConf',
