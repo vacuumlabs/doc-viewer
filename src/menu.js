@@ -8,6 +8,12 @@ export default [
     link: '/vacuum-book/',
   },
   {
+    title: 'Tools',
+    description: 'Learn how to properly use all the tools in Vacuum',
+    icon: 'fas fa-tools',
+    link: '/vacuum-book/tools/',
+  },
+  {
     title: 'Delivery (tech, design, product)',
     description:
       'Daily life of engineers and designers, client communication, hiring process, and more.',
@@ -43,14 +49,6 @@ export default [
     description: 'Vacuumlabs brand manual.',
     icon: 'fas fa-bullhorn',
     link: '/marketing-design/',
-  },
-  {
-    title: 'Tech Handbook',
-    description:
-      'Various technical stuff such as Google Drive backup, or JIRA management are documented here.',
-    icon: 'fa fa-terminal',
-    //updatedAt: '20160307T14:23:21',
-    link: '/tech-book/',
   },
   {
     title: 'Security Handbook',

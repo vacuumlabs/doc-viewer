@@ -3,7 +3,7 @@ import React from 'react'
 export default () => (
   <style>
     {`
-@import url(https://use.fontawesome.com/releases/v5.2.0/css/all.css);
+@import url(https://use.fontawesome.com/releases/v5.15.3/css/all.css);
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
