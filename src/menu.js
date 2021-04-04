@@ -19,6 +19,7 @@ export default [
       'Daily life of engineers and designers, client communication, hiring process, and more.',
     icon: 'fas fa-laptop-code',
     submenu: [
+      ['Daily Life', '/vacuum-book/delivery-life/'],
       ['Delivery Process', '/vacuum-book/delivery-process/'],
       ['Interviewing Engineers', '/assessment/'],
       ['Estimating Projects', '/vacuum-book/delivery-estimation/'],
@@ -30,7 +31,7 @@ export default [
     description:
       'Vacuumlabs Management tips, tricks, guidelines, and best practices.',
     icon: 'fas fa-tasks',
-    link: '/management-tips/',
+    link: '/vacuum-book/management/',
   },
   {
     title: 'Finance Handbook',
