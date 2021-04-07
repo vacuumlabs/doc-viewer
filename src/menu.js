@@ -27,6 +27,29 @@ export default [
     ],
   },
   {
+    title: 'Useful Links',
+    description: 'Links to tools we use',
+    icon: 'fas fa-link',
+    submenu: [
+      ['Payroll & Shares overview', 'http://payroll.vacuumlabs.com'],
+      ['Employee Managements System', 'http://ems.vacuumlabs.com'],
+      ['Finetracker', 'http://finetracker.vacuumlabs.com'],
+      ['Management Reports', 'https://report.vacuumlabs.com/'],
+      [
+        'Vacation Planning',
+        'https://docs.google.com/spreadsheets/d/1Ts6nrdbDbCnfkdR7M2D7bqvMnfHbyBCIO6A8IdWckrM/edit',
+      ],
+      [
+        'Vacation Spent',
+        'https://docs.google.com/spreadsheets/d/1hU_t7VeKY391qFxRjnQW7U1h78kZDukHuX8U-opT3ec/edit#gid=1583946389',
+      ],
+      [
+        'People Salary Levels',
+        'https://docs.google.com/spreadsheets/d/1hX0kV49x-IjRqg3cDJ701YZ0PmiDXKyDJYrFvF0h6kw/edit#gid=537514369',
+      ],
+    ],
+  },
+  {
     title: 'Management Tips',
     description:
       'Vacuumlabs Management tips, tricks, guidelines, and best practices.',
@@ -89,12 +112,5 @@ export default [
       'The ultimate copy & paste guide to writing Asciidoctor documents.',
     icon: 'fas fa-pencil-alt',
     link: '/asciidoctor-cheatsheet/',
-  },
-  {
-    title: 'ReportBot',
-    description: 'ReportBot collecting reports from Slack.',
-    icon: 'fab fa-slack',
-    link: 'https://report.vacuumlabs.com/',
-    newPage: true,
   },
 ]
