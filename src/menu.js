@@ -14,16 +14,30 @@ export default [
     link: '/vacuum-book/tools/',
   },
   {
-    title: 'Delivery (tech, design, product)',
+    title: 'Brand Manual',
     description:
-      'Daily life of engineers and designers, client communication, hiring process, and more.',
-    icon: 'fas fa-laptop-code',
+      'Learn to use our logo, fonts, colors, and slide templates correctly.',
+    icon: 'fas fa-flag',
+    link: '/vacuum-book/brand/',
+  },
+  {
+    title: 'Security Handbook',
+    description: 'Security is always excessive until it’s not enough.',
+    icon: 'fa fa-lock',
+    link: '/security-book/',
+  },
+  {
+    title: 'House Rules',
+    description: 'House rules for offices.',
+    icon: 'fa fa-building',
     submenu: [
-      ['Daily Life', '/vacuum-book/delivery-life/'],
-      ['Delivery Process', '/vacuum-book/delivery-process/'],
-      ['Interviewing Engineers', '/assessment/'],
-      ['Estimating Projects', '/vacuum-book/delivery-estimation/'],
-      ['Coding Tips', '/coding-tips/'],
+      ['Bratislava (The Spot)', '/vacuum-book/office-ba/'],
+      ['Bratislava (Flat)', '/vacuum-book/office-ba-flat/'],
+      ['Brno', 'vacuum-book/office-brn/'],
+      ['Budapest', 'vacuum-book/office-bud/'],
+      ['Košice', 'vacuum-book/office-ke/'],
+      ['Prague', 'vacuum-book/office-prg/'],
+      ['Prešov', 'vacuum-book/office-po/'],
     ],
   },
   {
@@ -50,6 +64,19 @@ export default [
     ],
   },
   {
+    title: 'Delivery (tech, design, product)',
+    description:
+      'Daily life of engineers and designers, client communication, hiring process, and more.',
+    icon: 'fas fa-laptop-code',
+    submenu: [
+      ['Daily Life', '/vacuum-book/delivery-life/'],
+      ['Delivery Process', '/vacuum-book/delivery-process/'],
+      ['Interviewing Engineers', '/assessment/'],
+      ['Estimating Projects', '/vacuum-book/delivery-estimation/'],
+      ['Coding Tips', '/coding-tips/'],
+    ],
+  },
+  {
     title: 'Management Tips',
     description:
       'Vacuumlabs Management tips, tricks, guidelines, and best practices.',
@@ -69,30 +96,10 @@ export default [
     link: '/hq/',
   },
   {
-    title: 'Marketing & Design',
-    description: 'Vacuumlabs brand manual.',
+    title: 'Marketing',
+    description: 'Vacuumlabs Marketing Guidelines',
     icon: 'fas fa-bullhorn',
-    link: '/marketing-design/',
-  },
-  {
-    title: 'Security Handbook',
-    description: 'Security is always excessive until it’s not enough.',
-    icon: 'fa fa-lock',
-    link: '/security-book/',
-  },
-  {
-    title: 'House Rules',
-    description: 'House rules for offices.',
-    icon: 'fa fa-building',
-    submenu: [
-      ['Bratislava (The Spot)', '/vacuum-book/office-ba/'],
-      ['Bratislava (Flat)', '/vacuum-book/office-ba-flat/'],
-      ['Brno', 'vacuum-book/office-brn/'],
-      ['Budapest', 'vacuum-book/office-bud/'],
-      ['Košice', 'vacuum-book/office-ke/'],
-      ['Prague', 'vacuum-book/office-prg/'],
-      ['Prešov', 'vacuum-book/office-po/'],
-    ],
+    link: '/vacuum-book/marketing/',
   },
   {
     title: 'ReactiveConf',
