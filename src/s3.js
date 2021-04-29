@@ -20,22 +20,22 @@ export default function createClient(options) {
     },
   })
 
-  function* readFile(file) {
-    return yield s3fsClient.readFile(file)
+  async function readFile(file) {
+    return await s3fsClient.readFile(file)
   }
 
-  function* writeFile(file, data) {
-    return yield s3fsClient.writeFile(file, data)
+  async function writeFile(file, data) {
+    return await s3fsClient.writeFile(file, data)
   }
 
-  function* unzip(stream, path) {
+  async function unzip(stream, path) {
     const tmpId = uuid()
     const tmpFolder = p.join(os.tmpdir(), tmpId)
 
     const extract = unzipper.Extract({path: tmpFolder})
     stream.pipe(extract)
 
-    return yield new Promise((resolve, reject) =>
+    return await new Promise((resolve, reject) =>
       extract.on('close', () => {
         const uploader = s3Client.uploadDir({
           localDir: tmpFolder,

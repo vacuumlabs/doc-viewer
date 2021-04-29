@@ -12,7 +12,7 @@ export function sendToLogin(req, res) {
   res.redirect(r.login)
 }
 
-export function* login(req, res) {
+export function login(req, res) {
   const oauthUrl = url.format({
     protocol: req.protocol,
     host: req.headers.host,
@@ -21,7 +21,7 @@ export function* login(req, res) {
   res.redirect(`${c.ssoUrl}/$login?${querystring.stringify({url: oauthUrl})}`)
 }
 
-export function* oauth(req, res) {
+export function oauth(req, res) {
   if (req.query.code) {
     saveCookie(res, 'access_token', req.query.code)
     res.redirect(req.cookies.redirectAfterLogin || r.index)

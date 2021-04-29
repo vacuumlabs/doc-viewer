@@ -1,4 +1,3 @@
-import {run} from 'yacol'
 import fetch from 'node-fetch'
 import {unauthorized} from './exceptions.js'
 import c from './config'
@@ -14,10 +13,10 @@ function headers(token) {
   return h
 }
 
-function* get(token, url) {
+async function get(token, url) {
   if (token == null) throw unauthorized
 
-  const response = yield fetch(url, {
+  const response = await fetch(url, {
     headers: headers(token),
     method: 'GET',
   })
@@ -27,15 +26,15 @@ function* get(token, url) {
   return response
 }
 
-export function* user(token) {
+export async function user(token) {
   const url = `${ghApiUrl}/user`
-  return yield (yield run(get, token, url)).json()
+  return await (await get(token, url)).json()
 }
 
-export function* amICollaborator(token, organization, repo) {
-  const {login} = yield run(user, token)
+export async function amICollaborator(token, organization, repo) {
+  const {login} = await user(token)
   const url = `${ghApiUrl}/repos/${organization}/${repo}/collaborators/${login}`
-  const response = yield run(get, token, url)
+  const response = await get(token, url)
 
   if (response.status === 204) return true
   if (response.status === 404) return false

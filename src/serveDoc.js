@@ -1,4 +1,3 @@
-import {run} from 'yacol'
 import path from 'path'
 import c from './config'
 import memoize from './memoize.js'
@@ -14,11 +13,11 @@ const amICollaborator = memoize(
   c.authorizationMaxAge,
 )
 
-function* checkRights(token, repo) {
+async function checkRights(token, repo) {
   return (
     c.disableAuth ||
     repo == null ||
-    (yield run(amICollaborator, token, c.ghOrganization, repo))
+    (await amICollaborator(token, c.ghOrganization, repo))
   )
 }
 
@@ -34,24 +33,26 @@ function absoluteDocPath(docRoot, localPart) {
   return path.join(docRoot, localPart)
 }
 
-function* _readConfig(docRoot) {
+async function _readConfig(docRoot) {
   const configFile = path.join(docRoot, 'docs.json')
-  return yield run(function* () {
-    const file = yield run(s3.readFile, configFile)
+  try {
+    const file = await s3.readFile(configFile)
     return JSON.parse(file.Body.toString())
-  }).catch((e) => {
+  } catch (e) {
     if (e.code === 'NoSuchKey') return {}
     else throw e
-  })
+  }
 }
 
 const readConfig = memoize(_readConfig, c.cacheMaxRecords, Infinity)
 
-function* loadFile(path) {
-  return yield run(s3.readFile, path).catch((e) => {
+async function loadFile(path) {
+  try {
+    return await s3.readFile(path)
+  } catch (e) {
     if (e.code === 'NoSuchKey') throw notFound
     else throw e
-  })
+  }
 }
 
 function serveFile(res, file) {
@@ -60,26 +61,22 @@ function serveFile(res, file) {
   res.send(file.Body)
 }
 
-export function* aliasToDocId(alias) {
-  const file = yield run(loadFile, path.join(c.finalPath, alias))
+export async function aliasToDocId(alias) {
+  const file = await loadFile(path.join(c.finalPath, alias))
   return file.Body.toString()
 }
 
 // Loading files from S3 with inifinite caching. Use only for immutable files.
 const loadDoc = memoize(loadFile, c.cacheMaxRecords, Infinity)
 
-export function* serveDoc(docId, localPart, req, res) {
+export async function serveDoc(docId, localPart, req, res) {
   const docRoot = getDocRoot(docId)
   const docPath = absoluteDocPath(docRoot, localPart)
-  const filePromise = run(loadDoc, docPath)
-  const config = yield run(readConfig, docRoot)
-  const hasRights = yield run(
-    checkRights,
-    req.cookies.access_token,
-    config.read,
-  )
+  const filePromise = loadDoc(docPath)
+  const config = await readConfig(docRoot)
+  const hasRights = await checkRights(req.cookies.access_token, config.read)
 
   if (!hasRights) throw notEnoughRights
 
-  serveFile(res, yield filePromise)
+  serveFile(res, await filePromise)
 }

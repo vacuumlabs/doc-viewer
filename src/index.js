@@ -1,7 +1,6 @@
 import path from 'path'
 import express from 'express'
 import favicon from 'serve-favicon'
-import {expressHelpers, run} from 'yacol'
 import cookieParser from 'cookie-parser'
 import c from './config'
 import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
@@ -28,19 +27,18 @@ if (c.isHttps) {
   })
 }
 
-const {register, runApp} = expressHelpers
 const s3 = c.s3
 
 app.use(cookieParser())
 app.use(favicon(path.join(__dirname, '../assets', 'favicon.ico')))
 
-function* drafts(req, res) {
-  yield run(serveDoc, req.params.docId, req.params[0], req, res)
+async function drafts(req, res) {
+  return await serveDoc(req.params.docId, req.params[0], req, res)
 }
 
-function* docs(req, res) {
-  const docId = yield run(aliasToDocId, req.params.name)
-  yield run(serveDoc, docId, req.params[0], req, res)
+async function docs(req, res) {
+  const docId = await aliasToDocId(req.params.name)
+  return await serveDoc(docId, req.params[0], req, res)
 }
 
 function assertApiKey(req, res) {
@@ -51,15 +49,15 @@ function assertApiKey(req, res) {
   return true
 }
 
-function* upload(req, res) {
+async function upload(req, res) {
   if (!assertApiKey(req, res)) return
 
   const docId = uuid()
-  yield run(s3.unzip, req, path.join(c.draftPath, docId))
+  await s3.unzip(req, path.join(c.draftPath, docId))
   res.status(200).send(docId)
 }
 
-function* alias(req, res) {
+async function alias(req, res) {
   if (!assertApiKey(req, res)) return
 
   const {docId, name} = req.params
@@ -69,11 +67,11 @@ function* alias(req, res) {
     return
   }
 
-  yield run(s3.writeFile, path.join(c.finalPath, name), docId)
+  await s3.writeFile(path.join(c.finalPath, name), docId)
   res.status(200).send()
 }
 
-function* index(req, res) {
+function index(req, res) {
   if (!c.disableAuth && req.cookies.access_token == null) throw unauthorized
   res.send(renderToString(home()))
 }
@@ -82,27 +80,26 @@ const esc = (s) => s.replace('$', '\\$')
 
 // Wrapper for web requests to handle exceptions from standard flow.
 const web = (handler) =>
-  function* (req, res) {
-    yield run(handler, req, res).catch((e) => {
+  async function (req, res) {
+    try {
+      await handler(req, res)
+    } catch (e) {
       if (e === notFound) sendNotFound(res)
       else if (e === unauthorized) sendToLogin(req, res)
       else if (e === notEnoughRights) sendNotEnoughRights(res)
       else throw e
-    })
+    }
   }
 
-register(app, 'get', esc(r.index), web(index))
-register(app, 'get', esc(r.login), web(login))
-register(app, 'get', esc(r.oauth), web(oauth))
-register(app, 'get', esc(r.drafts), web(drafts))
-register(app, 'post', esc(r.upload), upload)
-register(app, 'put', esc(r.alias), alias)
+app.get(esc(r.index), web(index))
+app.get(esc(r.login), web(login))
+app.get(esc(r.oauth), web(oauth))
+app.get(esc(r.drafts), web(drafts))
+app.post(esc(r.upload), upload)
+app.put(esc(r.alias), alias)
 
 // Has to be the last one, otherwise it would match all other routes.
-register(app, 'get', r.docs, web(docs))
+app.get(r.docs, web(docs))
 
-run(function* () {
-  run(runApp)
-  // eslint-disable-next-line no-console
-  app.listen(c.port, () => console.log(`App started on localhost:${c.port}.`))
-})
+// eslint-disable-next-line no-console
+app.listen(c.port, () => console.log(`App started on localhost:${c.port}.`))

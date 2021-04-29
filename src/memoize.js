@@ -1,4 +1,3 @@
-import {run} from 'yacol'
 export function create(size, maxAge) {
   return {
     maxAge,
@@ -9,7 +8,7 @@ export function create(size, maxAge) {
   }
 }
 
-function* get(cache, key, getValue) {
+async function get(cache, key, getValue) {
   const {keys, values, maxAge, size} = cache
   const now = Date.now()
 
@@ -20,12 +19,12 @@ function* get(cache, key, getValue) {
     cache.index = (cache.index + 1) % size
   }
 
-  if (!cache.values.hasOwnProperty(key)) add(key, yield run(getValue))
+  if (!cache.values.hasOwnProperty(key)) add(key, await getValue())
 
   const {ts, index} = values[key]
   if (now - ts >= maxAge) {
     keys[index] = undefined
-    add(key, yield run(getValue))
+    add(key, await getValue())
   }
 
   return values[key].value
@@ -33,12 +32,12 @@ function* get(cache, key, getValue) {
 
 export default function memoize(fn, size, maxAge) {
   const cache = create(size, maxAge)
-  return function* (...args) {
+  return async function (...args) {
     const key = JSON.stringify(Array.prototype.slice.call(args))
-    const getValue = function* () {
-      return yield run(fn, ...args)
+    const getValue = async function () {
+      return await fn(...args)
     }
 
-    return yield run(get, cache, key, getValue)
+    return await get(cache, key, getValue)
   }
 }
