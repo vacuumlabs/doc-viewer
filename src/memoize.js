@@ -33,8 +33,7 @@ function* get(cache, key, getValue) {
 
 export default function memoize(fn, size, maxAge) {
   const cache = create(size, maxAge)
-  return function* () {
-    const args = arguments
+  return function* (...args) {
     const key = JSON.stringify(Array.prototype.slice.call(args))
     const getValue = function* () {
       return yield run(fn, ...args)

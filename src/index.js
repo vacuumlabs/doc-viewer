@@ -103,5 +103,6 @@ register(app, 'get', r.docs, web(docs))
 
 run(function* () {
   run(runApp)
+  // eslint-disable-next-line no-console
   app.listen(c.port, () => console.log(`App started on localhost:${c.port}.`))
 })
