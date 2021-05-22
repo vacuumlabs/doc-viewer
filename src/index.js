@@ -9,8 +9,7 @@ import {aliasToDocId, serveDoc} from './serveDoc.js'
 import {isIdValid, uuid} from './id.js'
 import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 import r from './routes.js'
-import home from './home.js'
-import {renderToString} from 'react-dom/server'
+import html from './app/html'
 
 const app = express()
 
@@ -31,6 +30,7 @@ const s3 = c.s3
 
 app.use(cookieParser())
 app.use(favicon(path.join(__dirname, '../assets', 'favicon.ico')))
+app.use(express.static(path.join(__dirname, '../assets')))
 
 async function drafts(req, res) {
   return await serveDoc(req.params.docId, req.params[0], req, res)
@@ -73,7 +73,7 @@ async function alias(req, res) {
 
 function index(req, res) {
   if (!c.disableAuth && req.cookies.access_token == null) throw unauthorized
-  res.send(renderToString(home()))
+  res.send(html())
 }
 
 const esc = (s) => s.replace('$', '\\$')

@@ -1,6 +1,6 @@
 import React from 'react'
 import Style from './app.style'
-import menu from './menu.js'
+import menu from './menu'
 
 export default () => (
   <div>
