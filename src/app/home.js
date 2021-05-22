@@ -30,7 +30,7 @@ const Card = ({link, newPage, icon, title, description, children}) => {
   const hasSubmenu = children != null
   const A = (props, {children}) =>
     hasSubmenu ? (
-      <div {...props} />
+      <div {...props} tabIndex="-1" />
     ) : (
       <a href={link} {...(newPage && blank)} {...props} />
     )
