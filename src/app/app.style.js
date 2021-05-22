@@ -104,6 +104,13 @@ a:hover, a:focus, a:active {
 }
 
 @media screen and (max-width: 1024px) {
+  .wrapper {
+    width: auto;
+    margin: 0 1.5rem;
+  }
+  .cards {
+    grid-gap: 1.5rem;
+  }
   .card:focus .card__submenu, .card:focus-within .card__submenu {
     transform: scaleY(1.0);
   }
