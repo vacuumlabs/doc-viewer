@@ -1,6 +1,6 @@
 import React from 'react'
 import Style from './app.style'
-import menu from './menu.js'
+import menu from './menu'
 
 export default () => (
   <div>
@@ -30,7 +30,7 @@ const Card = ({link, newPage, icon, title, description, children}) => {
   const hasSubmenu = children != null
   const A = (props, {children}) =>
     hasSubmenu ? (
-      <div {...props} />
+      <div {...props} tabIndex="-1" />
     ) : (
       <a href={link} {...(newPage && blank)} {...props} />
     )
