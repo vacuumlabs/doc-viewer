@@ -19,19 +19,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const app = express()
 
-app.enable('trust proxy')
-
-if (c.isHttps) {
-  app.use((req, res, next) => {
-    if (!req.secure && req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(301, `https://${req.hostname}${req.url}`)
-    } else {
-      res.setHeader('Strict-Transport-Security', 'max-age=31536000')
-      next()
-    }
-  })
-}
-
 const s3 = c.s3
 
 app.use(cookieParser())
