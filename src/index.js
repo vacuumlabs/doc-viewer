@@ -1,15 +1,21 @@
 import path from 'path'
+import {fileURLToPath} from 'url'
 import express from 'express'
 import favicon from 'serve-favicon'
 import cookieParser from 'cookie-parser'
-import c from './config'
+import c from './config.js'
 import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
 import {sendToLogin, login, oauth} from './authorize.js'
 import {aliasToDocId, serveDoc} from './serveDoc.js'
 import {isIdValid, uuid} from './id.js'
 import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
 import r from './routes.js'
-import html from './app/html'
+import html from './app/html.js'
+
+// When running in ES Modules mode, Node doesn't provide __dirname. However, it
+// can be inferred from import.meta.url.
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 
 const app = express()
 

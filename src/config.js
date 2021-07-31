@@ -1,7 +1,7 @@
 import createS3Client from './s3.js'
 import transenv from 'transenv'
 
-export default transenv()(({str, bool}) => {
+export default transenv.default()(({str, bool}) => {
   const env = str('NODE_ENV', 'development')
   const isDev = env === 'development'
   const disableAuth = bool('disable_auth', false) && isDev

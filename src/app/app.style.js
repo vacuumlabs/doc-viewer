@@ -1,9 +1,5 @@
 /* eslint-disable max-len */
-import React from 'react'
-export default () => (
-  <style
-    dangerouslySetInnerHTML={{
-      __html: `
+export default `
 * {
   box-sizing: border-box;
 }
@@ -178,8 +174,4 @@ a:hover, a:focus, a:active {
     grid-template-columns: 1fr;
   }
 }
-
-`,
-    }}
-  />
-)
+`

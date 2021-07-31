@@ -1,5 +1,6 @@
-import {renderToString} from 'react-dom/server'
-import home from './home'
+import {renderToString} from 'react-dom/server.js'
+import home from './home.js'
+import style from './app.style.js'
 
 export default () => {
   const html = renderToString(home())
@@ -15,6 +16,7 @@ export default () => {
                 <link type="text/css" rel="stylesheet" href="/normalize.css" />
                 
                 <title>We Vacuumlabs</title>
+                <style>${style}</style>
             </head>
             <body>
                 ${html}

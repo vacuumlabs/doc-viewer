@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import {unauthorized} from './exceptions.js'
-import c from './config'
+import c from './config.js'
 
 const ghApiUrl = `${c.ssoUrl}/api/github`
 

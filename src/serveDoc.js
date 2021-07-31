@@ -1,5 +1,5 @@
 import path from 'path'
-import c from './config'
+import c from './config.js'
 import memoize from './memoize.js'
 import {amICollaborator as _amICollaborator} from './ghApi.js'
 import {isIdValid} from './id.js'

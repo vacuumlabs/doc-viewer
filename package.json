@@ -5,8 +5,9 @@
   "repository": "git@github.com:vacuumlabs/doc-viewer.git",
   "author": "Samuel Hapák <samuel.hapak@gmail.com>",
   "license": "Unlicense",
+  "type": "module",
   "scripts": {
-    "start": "babel-node -- src/index.js",
+    "start": "node -- src/index.js",
     "eslint": "eslint -- src",
     "test": "yarn eslint"
   },

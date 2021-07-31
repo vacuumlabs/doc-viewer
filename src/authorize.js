@@ -1,4 +1,4 @@
-import c from './config'
+import c from './config.js'
 import r from './routes.js'
 import url from 'url'
 import querystring from 'querystring'
