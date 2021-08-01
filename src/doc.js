@@ -70,6 +70,12 @@ const setHome = async (param, body, req) => {
   return http.ok
 }
 
+export const menu = async () => {
+  const file = await loadFile(p.join(c.homePath, 'menu.json'))
+  if (file == null) return null
+  return JSON.parse(file.Body.toString())
+}
+
 const alias = async ({docId, name}) => {
   if (!id.isValid(docId) || !id.isValid(name)) return http.bad
 

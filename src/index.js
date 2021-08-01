@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, '../assets')))
 http.register(app, '/\\$auth', auth.routes)
 
 // Home Page
-app.get('/', auth.authorize, (req, res) => res.send(html()))
+app.get('/', auth.authorize, async (req, res) => res.send(html(await doc.menu())))
 
 // Has to be the last one, otherwise it would match all other routes.
 http.register(app, null, doc.routes)

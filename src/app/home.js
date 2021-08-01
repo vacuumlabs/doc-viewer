@@ -1,5 +1,4 @@
 import React from 'react'
-import menu from './menu.js'
 
 function r([component, attr, ...children]) {
   return React.createElement(
@@ -47,7 +46,7 @@ const MenuItem = ({item}) => r(
     item.submenu && [SubMenu, {items: item.submenu}],
   ])
 
-export default () => r(
+export default (menu) => r(
   ['div', null,
     ['div', {className: 'line'}],
     ['div', {className: 'wrapper'},
