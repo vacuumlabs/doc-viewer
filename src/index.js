@@ -1,38 +1,36 @@
 import path from 'path'
 import {fileURLToPath} from 'url'
 import express from 'express'
+import * as http from './utils/http.js'
 import favicon from 'serve-favicon'
 import cookieParser from 'cookie-parser'
 import c from './config.js'
-import {sendNotFound, sendNotEnoughRights} from './errorPages.js'
-import {sendToLogin, login, oauth} from './authorize.js'
-import {aliasToDocId, serveDoc} from './serveDoc.js'
+import * as auth from './authorize.js'
+import * as doc  from './serveDoc.js'
 import {isIdValid, uuid} from './id.js'
-import {unauthorized, notFound, notEnoughRights} from './exceptions.js'
-import r from './routes.js'
 import html from './app/html.js'
+
+const s3 = c.s3
 
 // When running in ES Modules mode, Node doesn't provide __dirname. However, it
 // can be inferred from import.meta.url.
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-
 const app = express()
 
-const s3 = c.s3
-
+app.set('trust proxy', true)
 app.use(cookieParser())
+app.use(express.json())
+
+// Serve static assets
 app.use(favicon(path.join(__dirname, '../assets', 'favicon.ico')))
 app.use(express.static(path.join(__dirname, '../assets')))
 
-async function drafts(req, res) {
-  return await serveDoc(req.params.docId, req.params[0], req, res)
-}
+// Register auth routes
+http.register(app, '/\\$auth', auth.routes)
 
-async function docs(req, res) {
-  const docId = await aliasToDocId(req.params.name)
-  return await serveDoc(docId, req.params[0], req, res)
-}
+// Home Page
+app.get('/', auth.authorize, (req, res) => res.send(html()))
 
 function assertApiKey(req, res) {
   if (req.get('Authorization') !== c.apiKey) {
@@ -64,35 +62,11 @@ async function alias(req, res) {
   res.status(200).send()
 }
 
-function index(req, res) {
-  if (!c.disableAuth && req.cookies.access_token == null) throw unauthorized
-  res.send(html())
-}
-
-const esc = (s) => s.replace('$', '\\$')
-
-// Wrapper for web requests to handle exceptions from standard flow.
-const web = (handler) =>
-  async function (req, res) {
-    try {
-      await handler(req, res)
-    } catch (e) {
-      if (e === notFound) sendNotFound(res)
-      else if (e === unauthorized) sendToLogin(req, res)
-      else if (e === notEnoughRights) sendNotEnoughRights(res)
-      else throw e
-    }
-  }
-
-app.get(esc(r.index), web(index))
-app.get(esc(r.login), web(login))
-app.get(esc(r.oauth), web(oauth))
-app.get(esc(r.drafts), web(drafts))
-app.post(esc(r.upload), upload)
-app.put(esc(r.alias), alias)
+app.post('/\\$upload', upload)
+app.put('/\\$alias/:docId/:name', alias)
 
 // Has to be the last one, otherwise it would match all other routes.
-app.get(r.docs, web(docs))
+http.register(app, null, doc.routes)
 
 // eslint-disable-next-line no-console
 app.listen(c.port, () => console.log(`App started on localhost:${c.port}.`))

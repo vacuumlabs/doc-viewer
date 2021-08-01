@@ -1,82 +1,66 @@
-import path from 'path'
+import p from 'path'
 import c from './config.js'
 import memoize from './memoize.js'
-import {amICollaborator as _amICollaborator} from './ghApi.js'
 import {isIdValid} from './id.js'
-import {notFound, notEnoughRights} from './exceptions.js'
+import {authorize} from './authorize.js'
+import f from './utils/f.js'
+import * as http from './utils/http.js'
 
 const s3 = c.s3
 
-const amICollaborator = memoize(
-  _amICollaborator,
-  c.cacheMaxRecords,
-  c.authorizationMaxAge,
+const root = (docId) => p.join(c.draftPath, docId)
+
+const loadFile = async (path) => await f.try(
+  async () => await s3.readFile(path),
+  [[(e) => e.code === 'NoSuchKey', () => null]],
 )
 
-async function checkRights(token, repo) {
-  return (
-    c.disableAuth ||
-    repo == null ||
-    (await amICollaborator(token, c.ghOrganization, repo))
-  )
-}
+const readConfig = memoize(async (docRoot) => {
+  const file = await loadFile(p.join(docRoot, 'docs.json'))
+  return file == null ? {} : JSON.parse(file.Body.toString())
+}, c.cacheMaxRecords, Infinity)
 
-function getDocRoot(docId) {
-  if (!isIdValid(docId)) throw notFound
-  return path.join(c.draftPath, docId)
-}
-
-function absoluteDocPath(docRoot, localPart) {
-  localPart = path.normalize(localPart || '/')
-  if (localPart.endsWith('/')) localPart += 'index.html'
-  if (localPart.startsWith('..')) throw notFound
-  return path.join(docRoot, localPart)
-}
-
-async function _readConfig(docRoot) {
-  const configFile = path.join(docRoot, 'docs.json')
-  try {
-    const file = await s3.readFile(configFile)
-    return JSON.parse(file.Body.toString())
-  } catch (e) {
-    if (e.code === 'NoSuchKey') return {}
-    else throw e
-  }
-}
-
-const readConfig = memoize(_readConfig, c.cacheMaxRecords, Infinity)
-
-async function loadFile(path) {
-  try {
-    return await s3.readFile(path)
-  } catch (e) {
-    if (e.code === 'NoSuchKey') throw notFound
-    else throw e
-  }
-}
-
-function serveFile(res, file) {
-  res.set('Content-Type', file.ContentType)
-  res.set('Content-Length', file.ContentLength)
-  res.send(file.Body)
-}
-
-export async function aliasToDocId(alias) {
-  const file = await loadFile(path.join(c.finalPath, alias))
-  return file.Body.toString()
-}
+const httpFile = (file) => ({...http.headers({'Content-Type'  : file.ContentType,
+                                              'Content-Length': file.ContentLength}),
+                             ...http.body(file.Body)})
 
 // Loading files from S3 with inifinite caching. Use only for immutable files.
 const loadDoc = memoize(loadFile, c.cacheMaxRecords, Infinity)
 
-export async function serveDoc(docId, localPart, req, res) {
-  const docRoot = getDocRoot(docId)
-  const docPath = absoluteDocPath(docRoot, localPart)
-  const filePromise = loadDoc(docPath)
-  const config = await readConfig(docRoot)
-  const hasRights = await checkRights(req.cookies.access_token, config.read)
+const normalize = http.handler(({path}, body, req) => {
+  path = p.normalize(`/${path}`)
+  if (path.endsWith('/')) path += 'index.html'
 
-  if (!hasRights) throw notEnoughRights
+  if (path.startsWith('..')) return http.notFound
 
-  serveFile(res, await filePromise)
+  req.params.path = path
+  return http.proceed
+})
+
+const aliasToDocId = http.handler(async ({name}, body, req) => {
+  const file = await loadFile(p.join(c.finalPath, name))
+  if (file == null) return http.notFound
+
+  req.params.docId = file.Body.toString()
+  return http.proceed
+})
+
+const requireGroups = http.handler(async ({docId}, body, req) => {
+  if (!isIdValid(docId)) return http.notFound
+
+  req.groups = (await readConfig(root(docId))).read
+  return http.proceed
+})
+
+const serve = async ({docId, path}) => {
+  const doc = await loadDoc(p.join(root(docId), path))
+  if (doc == null) return http.notFound
+
+  return httpFile(doc)
 }
+
+const mw = [normalize, requireGroups, authorize]
+
+export const routes =
+[['get', '/\\$drafts/:docId/:path(*)', serve,               ...mw],
+ ['get', '/:name/:path(*)'           , serve, aliasToDocId, ...mw]]

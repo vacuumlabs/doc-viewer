@@ -7,6 +7,7 @@ export default transenv.default()(({str, bool}) => {
   const disableAuth = bool('disable_auth', false) && isDev
 
   return {
+    isDev,
     apiKey: str('API_KEY'),
     disableAuth,
     /* eslint-disable indent */
