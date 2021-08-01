@@ -1,4 +1,5 @@
 import axios from 'axios'
+import crypto from 'crypto'
 import c from './config.js'
 import * as http from './utils/http.js'
 import f from './utils/f.js'
@@ -42,6 +43,18 @@ export const authorize = http.handler((params, body, req) => {
     [[(e) => e.response?.status === 401, () => unauthenticated(req)]],
   )
 })
+
+function authHeaderMatch(req) {
+  const secret = req.get('Authorization')
+
+  return secret != null
+      && secret.length === c.apiKey.length
+      && crypto.timingSafeEqual(Buffer.from(secret), Buffer.from(c.apiKey))
+}
+
+export const authorizeApiKey = http.handler((params, body, req) =>
+  authHeaderMatch(req) ? http.proceed : http.unauthenticated,
+)
 
 export const routes =
 [['get', '/login'   , login('/$auth/callback')],

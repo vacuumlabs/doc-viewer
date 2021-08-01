@@ -32,25 +32,13 @@ http.register(app, '/\\$auth', auth.routes)
 // Home Page
 app.get('/', auth.authorize, (req, res) => res.send(html()))
 
-function assertApiKey(req, res) {
-  if (req.get('Authorization') !== c.apiKey) {
-    res.status(401).send('Invalid API Key')
-    return false
-  }
-  return true
-}
-
 async function upload(req, res) {
-  if (!assertApiKey(req, res)) return
-
   const docId = uuid()
   await s3.unzip(req, path.join(c.draftPath, docId))
   res.status(200).send(docId)
 }
 
 async function alias(req, res) {
-  if (!assertApiKey(req, res)) return
-
   const {docId, name} = req.params
   const isReqValid = isIdValid(docId) && isIdValid(name)
   if (!isReqValid) {
@@ -62,8 +50,8 @@ async function alias(req, res) {
   res.status(200).send()
 }
 
-app.post('/\\$upload', upload)
-app.put('/\\$alias/:docId/:name', alias)
+app.post('/\\$upload', auth.authorizeApiKey, upload)
+app.put('/\\$alias/:docId/:name', auth.authorizeApiKey, alias)
 
 // Has to be the last one, otherwise it would match all other routes.
 http.register(app, null, doc.routes)
