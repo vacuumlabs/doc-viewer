@@ -65,6 +65,11 @@ const upload = async (param, body, req) => {
   return http.body(docId)
 }
 
+const setHome = async (param, body, req) => {
+  await s3.unzip(req, c.homePath)
+  return http.ok
+}
+
 const alias = async ({docId, name}) => {
   if (!id.isValid(docId) || !id.isValid(name)) return http.bad
 
@@ -75,7 +80,8 @@ const alias = async ({docId, name}) => {
 const mw = [normalize, requireGroups, auth.authorize]
 
 export const routes =
-[['get' , '/\\$drafts/:docId/:path(*)', serve ,               ...mw],
- ['get' , '/:name/:path(*)'           , serve , aliasToDocId, ...mw],
- ['post', '/\\$upload'                , upload, auth.authorizeApiKey],
- ['put' , '/\\$alias/:docId/:name'    , alias , auth.authorizeApiKey]]
+[['get' , '/\\$drafts/:docId/:path(*)', serve  ,               ...mw],
+ ['get' , '/:name/:path(*)'           , serve  , aliasToDocId, ...mw],
+ ['post', '/\\$upload'                , upload , auth.authorizeApiKey],
+ ['post', '/\\$home'                  , setHome, auth.authorizeApiKey],
+ ['put' , '/\\$alias/:docId/:name'    , alias  , auth.authorizeApiKey]]

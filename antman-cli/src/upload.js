@@ -32,10 +32,10 @@ function deployedUrl(host, docId, isDraft) {
   return `${host}${isDraft ? '/$drafts' : ''}/${docId}/`
 }
 
-export function* upload(apiKey, host, folder) {
+function* up(apiKey, host, hostPath, folder) {
   const archive = archiver('zip')
   const [uploadReq, response] = request(host, {
-    path: '/$upload',
+    path: hostPath,
     method: 'POST',
     apiKey: apiKey,
   })
@@ -55,9 +55,20 @@ export function* upload(apiKey, host, folder) {
   if (result.statusCode !== 200) {
     throw new Error(`Server returned: HTTP ${result.statusCode} -- ${result.body}`)
   } else{
-    console.log(`Deploy successful on ${deployedUrl(host, result.body, true)}`)
     return result.body
   }
+}
+
+export function* upload(apiKey, host, folder) {
+  const body = yield run(up, apiKey, host, '/$upload', folder)
+  console.log(`Deploy successful on ${deployedUrl(host, body, true)}`)
+  return body
+}
+
+export function* home(apiKey, host, folder) {
+  const body = yield run(up, apiKey, host, '/$home', folder)
+  console.log('Homepage successfully uploaded')
+  return body
 }
 
 export function* link(apiKey, host, folder, docId) {

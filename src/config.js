@@ -30,5 +30,6 @@ export default transenv.default()(({str, bool}) => {
     }),
     draftPath: 'draft',
     finalPath: 'final',
+    homePath: 'home',
   }
 })
