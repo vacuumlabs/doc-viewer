@@ -1,7 +1,7 @@
 import p from 'path'
 import c from './config.js'
 import memoize from './memoize.js'
-import {authorize} from './authorize.js'
+import * as auth from './authorize.js'
 import * as id from './utils/id.js'
 import f from './utils/f.js'
 import * as http from './utils/http.js'
@@ -59,8 +59,23 @@ const serve = async ({docId, path}) => {
   return httpFile(doc)
 }
 
-const mw = [normalize, requireGroups, authorize]
+const upload = async (param, body, req) => {
+  const docId = id.generate()
+  await s3.unzip(req, p.join(c.draftPath, docId))
+  return http.body(docId)
+}
+
+const alias = async ({docId, name}) => {
+  if (!id.isValid(docId) || !id.isValid(name)) return http.bad
+
+  await s3.writeFile(p.join(c.finalPath, name), docId)
+  return http.ok
+}
+
+const mw = [normalize, requireGroups, auth.authorize]
 
 export const routes =
-[['get', '/\\$drafts/:docId/:path(*)', serve,               ...mw],
- ['get', '/:name/:path(*)'           , serve, aliasToDocId, ...mw]]
+[['get' , '/\\$drafts/:docId/:path(*)', serve ,               ...mw],
+ ['get' , '/:name/:path(*)'           , serve , aliasToDocId, ...mw],
+ ['post', '/\\$upload'                , upload, auth.authorizeApiKey],
+ ['put' , '/\\$alias/:docId/:name'    , alias , auth.authorizeApiKey]]

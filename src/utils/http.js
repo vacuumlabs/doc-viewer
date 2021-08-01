@@ -8,6 +8,7 @@ export const proceed = null
 export const notFound        = {status: 404, body: 'Not Found'}
 export const unauthorized    = {status: 403, body: 'Forbidden'}
 export const unauthenticated = {status: 401, body: 'Unauthorized'}
+export const bad             = {status: 400, body: 'Bad Request'}
 export const ok              = {status: 200, body: 'OK'}
 
 export const json     = (data)        => ({json: data})
