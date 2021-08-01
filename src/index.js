@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser'
 import c from './config.js'
 import * as auth from './authorize.js'
 import * as doc  from './serveDoc.js'
-import {isIdValid, uuid} from './id.js'
+import * as id from './utils/id.js'
 import html from './app/html.js'
 
 const s3 = c.s3
@@ -33,14 +33,14 @@ http.register(app, '/\\$auth', auth.routes)
 app.get('/', auth.authorize, (req, res) => res.send(html()))
 
 async function upload(req, res) {
-  const docId = uuid()
+  const docId = id.generate()
   await s3.unzip(req, path.join(c.draftPath, docId))
   res.status(200).send(docId)
 }
 
 async function alias(req, res) {
   const {docId, name} = req.params
-  const isReqValid = isIdValid(docId) && isIdValid(name)
+  const isReqValid = id.isValid(docId) && id.isValid(name)
   if (!isReqValid) {
     res.status(400).send('Invalid request.')
     return

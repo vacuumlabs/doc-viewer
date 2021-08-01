@@ -1,7 +1,7 @@
-export function isIdValid(id) {
+export function isValid(id) {
   return id && id.match(/^[a-zA-Z0-9-_]*$/)
 }
 
-export function uuid() {
+export function generate() {
   return Math.floor((Date.now() + Math.random()) * 1000).toString(36)
 }

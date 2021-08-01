@@ -1,8 +1,8 @@
 import p from 'path'
 import c from './config.js'
 import memoize from './memoize.js'
-import {isIdValid} from './id.js'
 import {authorize} from './authorize.js'
+import * as id from './utils/id.js'
 import f from './utils/f.js'
 import * as http from './utils/http.js'
 
@@ -46,7 +46,7 @@ const aliasToDocId = http.handler(async ({name}, body, req) => {
 })
 
 const requireGroups = http.handler(async ({docId}, body, req) => {
-  if (!isIdValid(docId)) return http.notFound
+  if (!id.isValid(docId)) return http.notFound
 
   req.groups = (await readConfig(root(docId))).read
   return http.proceed
