@@ -16,7 +16,6 @@ export default transenv.default()(({str, bool}) => {
       : {
           ssoKey: str('VL_SSO_KEY'),
           ssoUrl: str('VL_SSO_URL'),
-          ghOrganization: str('GH_ORGANIZATION'),
         }),
     /* eslint-enable indent */
     port: str('PORT'),
