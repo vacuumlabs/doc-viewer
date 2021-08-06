@@ -10,13 +10,13 @@ const s3 = c.s3
 
 const root = (docId) => p.join(c.draftPath, docId)
 
-const loadFile = async (path) => await f.try(
-  async () => await s3.readFile(path),
+const loadFile = async (...paths) => await f.try(
+  async () => await s3.readFile(p.join(...paths)),
   [[(e) => e.code === 'NoSuchKey', () => null]],
 )
 
 const readConfig = memoize(async (docRoot) => {
-  const file = await loadFile(p.join(docRoot, 'docs.json'))
+  const file = await loadFile(docRoot, 'docs.json')
   return file == null ? {} : JSON.parse(file.Body.toString())
 }, c.cacheMaxRecords, Infinity)
 
@@ -38,7 +38,7 @@ const normalize = http.handler(({path}, body, req) => {
 })
 
 const aliasToDocId = http.handler(async ({name}, body, req) => {
-  const file = await loadFile(p.join(c.finalPath, name))
+  const file = await loadFile(c.finalPath, name)
   if (file == null) return http.notFound
 
   req.params.docId = file.Body.toString()
@@ -53,7 +53,7 @@ const requireGroups = http.handler(async ({docId}, body, req) => {
 })
 
 const serve = async ({docId, path}) => {
-  const doc = await loadDoc(p.join(root(docId), path))
+  const doc = await loadDoc(root(docId), path)
   if (doc == null) return http.notFound
 
   return httpFile(doc)
@@ -71,7 +71,7 @@ const setHome = async (param, body, req) => {
 }
 
 export const menu = async () => {
-  const file = await loadFile(p.join(c.homePath, 'menu.json'))
+  const menu = await loadFile(c.homePath, 'menu.json')
   if (file == null) return null
   return JSON.parse(file.Body.toString())
 }
