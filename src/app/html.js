@@ -1,8 +1,7 @@
 import {renderToString} from 'react-dom/server.js'
 import home from './home.js'
-import style from './app.style.js'
 
-export default (menu) => {
+export default ({style, menu}) => {
   const html = renderToString(home(menu))
 
   return `

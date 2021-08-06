@@ -5,6 +5,7 @@ import * as auth from './authorize.js'
 import * as id from './utils/id.js'
 import f from './utils/f.js'
 import * as http from './utils/http.js'
+import defaultStyle from './app/app.style.js'
 
 const s3 = c.s3
 
@@ -70,10 +71,15 @@ const setHome = async (param, body, req) => {
   return http.ok
 }
 
-export const menu = async () => {
-  const menu = await loadFile(c.homePath, 'menu.json')
-  if (file == null) return null
-  return JSON.parse(file.Body.toString())
+export const home = async () => {
+  const load = async (name) => (await loadFile(c.homePath, name))
+                               ?.Body
+                               ?.toString()
+
+  const menu  = (await load('menu.json')) ?? 'null'
+  const style = (await load('style.css')) ?? defaultStyle
+
+  return {menu: JSON.parse(menu), style}
 }
 
 const alias = async ({docId, name}) => {
