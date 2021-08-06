@@ -76,10 +76,11 @@ export const home = async () => {
                                ?.Body
                                ?.toString()
 
-  const menu  = (await load('menu.json')) ?? 'null'
-  const style = (await load('style.css')) ?? defaultStyle
+  const menu   = (await load('menu.json'))   ?? 'null'
+  const config = (await load('config.json')) ?? 'null'
+  const style  = (await load('style.css'))   ?? defaultStyle
 
-  return {menu: JSON.parse(menu), style}
+  return {menu: JSON.parse(menu), config: JSON.parse(config), style}
 }
 
 const alias = async ({docId, name}) => {

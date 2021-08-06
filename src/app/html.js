@@ -1,7 +1,8 @@
 import {renderToString} from 'react-dom/server.js'
 import home from './home.js'
 
-export default ({style, menu}) => {
+export default ({style, menu, config}) => {
+  config = config ?? {title: 'Handbook'}
   const html = renderToString(home(menu))
 
   return `
@@ -14,7 +15,7 @@ export default ({style, menu}) => {
                 <link type="text/css" rel="stylesheet" href="//use.fontawesome.com/releases/v5.15.3/css/all.css" />
                 <link type="text/css" rel="stylesheet" href="/normalize.css" />
                 
-                <title>We Vacuumlabs</title>
+                <title>${config.title}</title>
                 <style>${style}</style>
             </head>
             <body>
