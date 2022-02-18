@@ -71,16 +71,30 @@ const setHome = async (param, body, req) => {
   return http.ok
 }
 
+export const oldHome = async () => {
+  const load = async (name) => (await loadFile(c.homePath, name))
+                               ?.Body
+                               ?.toString()
+
+  const menu     = (await load('old_menu.json')) ?? 'null'
+  const config   = (await load('config.json'))   ?? 'null'
+  const style    = (await load('old_style.css')) ?? defaultStyle
+  const linkText = 'null'
+
+  return {menu: JSON.parse(menu), config: JSON.parse(config), style, linkText}
+} 
+
 export const home = async () => {
   const load = async (name) => (await loadFile(c.homePath, name))
                                ?.Body
                                ?.toString()
 
-  const menu   = (await load('menu.json'))   ?? 'null'
-  const config = (await load('config.json')) ?? 'null'
-  const style  = (await load('style.css'))   ?? defaultStyle
+  const menu     = (await load('menu.json'))   ?? 'null'
+  const config   = (await load('config.json')) ?? 'null'
+  const style    = (await load('style.css'))   ?? defaultStyle
+  const linkText = (await load('text.json'))   ?? 'null'
 
-  return {menu: JSON.parse(menu), config: JSON.parse(config), style}
+  return {menu: JSON.parse(menu), config: JSON.parse(config), style, linkText: JSON.parse(linkText)}
 }
 
 const alias = async ({docId, name}) => {
