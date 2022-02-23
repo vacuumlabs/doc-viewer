@@ -1,9 +1,9 @@
 import {renderToString} from 'react-dom/server.js'
 import home from './home.js'
 
-export default ({style, menu, config}) => {
+export default ({style, menu, config, notionLinkProps}) => {
   config = config ?? {title: 'Handbook'}
-  const html = renderToString(home(menu))
+  const html = renderToString(home(menu, notionLinkProps))
 
   return `
         <html lang="en">
