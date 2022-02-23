@@ -46,14 +46,14 @@ const MenuItem = ({item}) => r(
     item.submenu && [SubMenu, {items: item.submenu}],
   ])
 
-const Text = ({textWithLink}) => r(
+const TextWithLink = ({descriptionBefore, descriptionAfter, link, linkText}) => r(
     ['p', {className: 'text__wrapper'},
-      textWithLink.descriptionBefore,
-      ['a', {href:textWithLink.link ?? '', className:'link__text'}, textWithLink.linkText],
-      textWithLink.descriptionAfter,
+      descriptionBefore,
+      ['a', {href:link ?? '', className:'link__text'}, linkText],
+      descriptionAfter,
     ])
 
-export default (menu, textWithLink) => r(
+export default (menu, {descriptionBefore, descriptionAfter, link, linkText}) => r(
   ['div', null,
     ['div', {className: 'line'}],
     ['div', {className: 'wrapper'},
@@ -65,6 +65,6 @@ export default (menu, textWithLink) => r(
       ['section', {className: 'cards'},
         ...menu.map((item, index) => [MenuItem, {key: index, item}]),
       ],
-      ['section', {className: 'text_with_link'}, [Text, {textWithLink}]],
+      ['section', {className: 'text_with_link'}, [TextWithLink, {descriptionBefore, descriptionAfter, link, linkText}]],
     ],
   ])
