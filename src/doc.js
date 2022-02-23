@@ -79,9 +79,9 @@ export const oldHome = async () => {
   const menu     = (await load('old_menu.json')) ?? 'null'
   const config   = (await load('config.json'))   ?? 'null'
   const style    = (await load('old_style.css')) ?? defaultStyle
-  const linkText = 'null'
+  const notionLinkProps = 'null'
 
-  return {menu: JSON.parse(menu), config: JSON.parse(config), style, linkText}
+  return {menu: JSON.parse(menu), config: JSON.parse(config), style, notionLinkProps}
 } 
 
 export const home = async () => {
@@ -92,9 +92,9 @@ export const home = async () => {
   const menu     = (await load('menu.json'))   ?? 'null'
   const config   = (await load('config.json')) ?? 'null'
   const style    = (await load('style.css'))   ?? defaultStyle
-  const linkText = (await load('text.json'))   ?? 'null'
+  const notionLinkProps = (await load('text.json'))   ?? 'null'
 
-  return {menu: JSON.parse(menu), config: JSON.parse(config), style, linkText: JSON.parse(linkText)}
+  return {menu: JSON.parse(menu), config: JSON.parse(config), style, notionLinkProps: JSON.parse(notionLinkProps)}
 }
 
 const alias = async ({docId, name}) => {

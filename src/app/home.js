@@ -53,7 +53,7 @@ const TextWithLink = ({descriptionBefore, descriptionAfter, link, linkText}) => 
       descriptionAfter,
     ])
 
-export default (menu, {descriptionBefore, descriptionAfter, link, linkText}) => r(
+export default (menu, notionLinkProps) => r(
   ['div', null,
     ['div', {className: 'line'}],
     ['div', {className: 'wrapper'},
@@ -65,6 +65,6 @@ export default (menu, {descriptionBefore, descriptionAfter, link, linkText}) => 
       ['section', {className: 'cards'},
         ...menu.map((item, index) => [MenuItem, {key: index, item}]),
       ],
-      ['section', {className: 'text_with_link'}, [TextWithLink, {descriptionBefore, descriptionAfter, link, linkText}]],
+      ['section', {className: 'text_with_link'}, [TextWithLink, notionLinkProps]],
     ],
   ])
