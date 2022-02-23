@@ -82,17 +82,17 @@ export const oldHome = async () => {
   const notionLinkProps = 'null'
 
   return {menu: JSON.parse(menu), config: JSON.parse(config), style, notionLinkProps}
-} 
+}
 
 export const home = async () => {
   const load = async (name) => (await loadFile(c.homePath, name))
                                ?.Body
                                ?.toString()
 
-  const menu     = (await load('menu.json'))   ?? 'null'
-  const config   = (await load('config.json')) ?? 'null'
-  const style    = (await load('style.css'))   ?? defaultStyle
-  const notionLinkProps = (await load('text.json'))   ?? 'null'
+  const menu     = (await load('menu.json'))        ?? 'null'
+  const config   = (await load('config.json'))      ?? 'null'
+  const style    = (await load('style.css'))        ?? defaultStyle
+  const notionLinkProps = (await load('text.json')) ?? 'null'
 
   return {menu: JSON.parse(menu), config: JSON.parse(config), style, notionLinkProps: JSON.parse(notionLinkProps)}
 }
