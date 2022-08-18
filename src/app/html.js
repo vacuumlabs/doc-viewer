@@ -12,7 +12,7 @@ export default ({style, menu, config, notionLinkProps}) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
                 <meta name="theme-color" content="#000000">
                 <link rel="shortcut icon" href="/favicon.ico">
-                <link type="text/css" rel="stylesheet" href="//use.fontawesome.com/releases/v5.15.3/css/all.css" />
+                <link type="text/css" rel="stylesheet" href="//use.fontawesome.com/releases/v6.1.2/css/all.css" />
                 <link type="text/css" rel="stylesheet" href="/normalize.css" />
                 
                 <title>${config.title}</title>
