@@ -15,7 +15,7 @@
     "@faceleg/s3": "^4.5.0",
     "axios": "^0.21.2",
     "cookie-parser": "^1.4.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "minimist": "^1.2.6",
